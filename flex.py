@@ -10,6 +10,9 @@ from subprocess import PIPE
 def logInfo(info):
     print(info, flush=True)
 
+def logError(errorMsg):
+    print(f'ERROR: {errorMsg}', flush=True)
+
 def getFlexHeaders(flexUser, flexPassword):
     """Returns http headers with fresh access token required to complete a Flex Capacity request"""
     flexHeaders = headers.get("FlexCapacityRequest")
@@ -124,6 +127,7 @@ def forfeitOffer(flexHeaders, offer, reasonForForfeit):
         return True
     else:
         logInfo(f"Unable to forfeit offer {offer.get('offerId')}. Server returned status code {request.status_code}")
+        logError(request.json())
         return False
 
 def pruneOffersByLocation(flexHeaders, offers, desiredLocations):
