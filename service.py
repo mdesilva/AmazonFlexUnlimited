@@ -1,10 +1,16 @@
 from flex import findJobs, logInfo
 import time
 import datetime
+import sys
 
 if __name__ == "__main__":
+    resetTimeInSeconds = 1800
+    username = sys.argv[1]
+    password = sys.argv[2]
+    desiredStartTime = int(sys.argv[3])
+    desiredEndTime = int(sys.argv[4])
     while True:
         logInfo(f"Starting job finder at {datetime.datetime.now()}")
-        findJobs("thushara70@ymail.com", "manuja98", 7, 13)
-        logInfo(f"Too many requests. Resuming in 1 hour...Timestamp: {datetime.datetime.now()}")
-        time.sleep(3600)
+        findJobs(username, password, desiredStartTime, desiredEndTime)
+        logInfo(f"Too many requests. Resuming in {resetTimeInSeconds / 60} minutes...Timestamp: {datetime.datetime.now()}")
+        time.sleep(resetTimeInSeconds)
