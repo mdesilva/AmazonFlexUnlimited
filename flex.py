@@ -116,26 +116,27 @@ def forfeitOffer(flexHeaders, offer, reasonForForfeit):
     payload = {
         "pickUpTime": startTimestamp
     }
+    logInfo(f"Start timestamp {startTimestamp}")
     flexHeaders["X-Amz-Date"] = getAmzDate()
-    request = requests.delete(f'{routes.get("ForfeitOffer")}{startTimestamp}', headers=flexHeaders, json=payload)
+    request = requests.delete(f'https://flex-capacity-na.amazon.com/schedule/blocks/{startTimestamp}', headers=flexHeaders, json=payload)
     if (request.status_code == 200):
-        logInfo(f"Successfully forfeited offer {id} due to {reasonForForfeit}")
+        logInfo(f"Successfully forfeited offer {offer.get('offerId')} due to {reasonForForfeit}")
         return True
     else:
-        logInfo(f"Unable to forfeit offer {id}. Server returned status code {request.status_code}")
+        logInfo(f"Unable to forfeit offer {offer.get('offerId')}. Server returned status code {request.status_code}")
         return False
 
 def pruneOffersByLocation(flexHeaders, offers, desiredLocations):
     for offer in offers:
         if (offer.get("serviceAreaId") not in desiredLocations):
-            forfeitOffer(flexHeaders, offer)
+            forfeitOffer(flexHeaders, offer, "location out of bounds")
 
 def pruneOffersByTime(flexHeaders, offers, desiredStartHour, desiredEndHour):
     logInfo("Pruning any accepted offers by time...")
     for offer in offers:
         endHour = datetime.datetime.fromtimestamp(offer.get("expirationDate")).hour
         if (endHour < desiredStartHour or endHour > desiredEndHour):
-            forfeitOffer(flexHeaders, offer)
+            forfeitOffer(flexHeaders, offer, "time out of bounds")
     logInfo("Prune by time complete.")
 
 def findJobs(username, password, desiredStartHour, desiredEndHour):
