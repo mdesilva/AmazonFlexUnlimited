@@ -24,3 +24,9 @@ routes = {
     "GetAuthToken": "https://api.amazon.com/auth/register",
     "ForfeitOffer": "https://flex-capacity-na.amazon.com/schedule/blocks/"
 }
+
+FlexLocations = {
+     "2": "UNY1",
+     "721061b3-a4f1-4244-99b3-a453c9cb864e": "C077",
+     "acf06702-57ba-47f3-a34f-19e536a69fc0": "C506"
+}

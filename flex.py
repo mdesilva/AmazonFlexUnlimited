@@ -3,7 +3,7 @@ import json
 import datetime
 import time
 from sys import argv
-from constants import headers, routes
+from constants import headers, routes, FlexLocations
 import subprocess
 from subprocess import PIPE
 
@@ -16,7 +16,7 @@ def logError(errorMsg):
 def getFlexHeaders(flexUser, flexPassword):
     """Returns http headers with fresh access token required to complete a Flex Capacity request"""
     flexHeaders = headers.get("FlexCapacityRequest")
-    flexHeaders["x-amz-access-token"] = getAuthTokenUsingCurl()
+    flexHeaders["x-amz-access-token"] = getAuthToken(flexUser, flexPassword) #getAuthTokenUsingCurl
     return flexHeaders
 
 def getAmzDate():
@@ -65,7 +65,7 @@ def getAuthToken(username, password):
     return response.get("response").get("success").get("tokens").get("bearer").get("access_token")
 
 def getAuthTokenUsingCurl():
-   token = subprocess.run("./auth.sh", shell=True, stdout=PIPE, stderr=PIPE)
+   token = subprocess.run("/home/mdesilva/flexunlimited/auth.sh", shell=True, stdout=PIPE, stderr=PIPE)
    return token.stdout[1:-2].decode("utf-8")
 
 def getOffers(flexHeaders):
@@ -77,13 +77,6 @@ def getOffers(flexHeaders):
     """
     flexHeaders["X-Amz-Date"] = getAmzDate() #must always be most up-to-date timestamp
     payload = {
-        "filters": {
-            "timeFilter": {
-                "endTime": "13:00",
-                "startTime": "07:00"
-            },
-            "serviceAreaFilter": ["2", "721061b3-a4f1-4244-99b3-a453c9cb864e"]
-        },
         "serviceAreaIds": ["2"],
         "apiVersion": "V2"
     }
@@ -131,33 +124,52 @@ def forfeitOffer(flexHeaders, offer, reasonForForfeit):
         return False
 
 def pruneOffersByLocation(flexHeaders, offers, desiredLocations):
+    logInfo("Pruning any accepted offers by location...")
+    remainingOffers = []
     for offer in offers:
-        if (offer.get("serviceAreaId") not in desiredLocations):
-            forfeitOffer(flexHeaders, offer, "location out of bounds")
+        if (FlexLocations[offer.get("serviceAreaId")] not in desiredLocations):
+            if (not forfeitOffer(flexHeaders, offer, "location out of bounds")):
+                remainingOffers.append(offer)
+        else:
+            remainingOffers.append(offer)
+    logInfo("Prune by location complete.")
+    return remainingOffers
 
 def pruneOffersByTime(flexHeaders, offers, desiredStartHour, desiredEndHour):
     logInfo("Pruning any accepted offers by time...")
+    remainingOffers = []
     for offer in offers:
         endHour = datetime.datetime.fromtimestamp(offer.get("expirationDate")).hour
         if (endHour < desiredStartHour or endHour > desiredEndHour):
-            forfeitOffer(flexHeaders, offer, "time out of bounds")
+            if (not forfeitOffer(flexHeaders, offer, "time out of bounds")):
+                remainingOffers.append(offer)
+        else:
+            remainingOffers.append(offer)
     logInfo("Prune by time complete.")
+    return remainingOffers
 
-def findJobs(username, password, desiredStartHour, desiredEndHour):
+def finishJobFinderCycle(flexHeaders, startTimestamp, endTimestamp, acceptedOffers, desiredStartHour, desiredEndHour, desiredLocations):
+    elapsedTime = (endTimestamp - startTimestamp)
+    acceptedOffers = pruneOffersByTime(flexHeaders, acceptedOffers, desiredStartHour, desiredEndHour)
+    acceptedOffers = pruneOffersByLocation(flexHeaders, acceptedOffers, desiredLocations)
+    logInfo(f"Accepted {len(acceptedOffers)} offers in {elapsedTime} seconds.")
+    return 
+
+def findJobs(username, password, desiredStartHour, desiredEndHour, desiredLocations):
     flexHeaders = getFlexHeaders(username, password)
-    acceptedOfferCount = 0
+    retries = 0
     acceptedOffers = []
     startTimestamp = time.time()
-    while(True):
+    while(retries < 1000):
         offersResponse = getOffers(flexHeaders)
         if (offersResponse.status_code == 200):
             currentOffers = offersResponse.json().get("offerList")
             for offer in currentOffers:
                 if (acceptOffer(flexHeaders, offer.get("offerId"))):
-                    acceptedOfferCount += 1
                     acceptedOffers.append(offer)
+            retries += 1
         else:
-            endTimestamp = time.time()
-            elapsedTime = (endTimestamp - startTimestamp)
-            pruneOffersByTime(flexHeaders, acceptedOffers, desiredStartHour, desiredEndHour)
-            return f"Accepted {acceptedOfferCount} offers in {elapsedTime} seconds."
+            logError(offersResponse.json())
+            return finishJobFinderCycle(flexHeaders, startTimestamp, time.time(), accaptedOffers, desiredStartHour, desiredEndHour, desiredLocations)
+    logInfo("Job search cycle ending...")
+    return finishJobFinderCycle(flexHeaders, startTimestamp, time.time(), accaptedOffers, desiredStartHour, desiredEndHour, desiredLocations)
