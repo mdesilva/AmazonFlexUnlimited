@@ -127,8 +127,9 @@ def pruneOffersByLocation(flexHeaders, offers, desiredLocations):
     logInfo("Pruning any accepted offers by location...")
     remainingOffers = []
     for offer in offers:
-        if (FlexLocations[offer.get("serviceAreaId")] not in desiredLocations):
-            if (not forfeitOffer(flexHeaders, offer, "location out of bounds")):
+        location = offer.get("serviceAreaId")
+        if (location not in FlexLocations): #FlexLocations ONLY HAS THE 3 LOCATIONS WE CURRENTLY WANT. CHANGE THIS TO USE desiredLocations once we have all NYC locations
+            if (not forfeitOffer(flexHeaders, offer, "unidentified location")):
                 remainingOffers.append(offer)
         else:
             remainingOffers.append(offer)
@@ -148,14 +149,20 @@ def pruneOffersByTime(flexHeaders, offers, desiredStartHour, desiredEndHour):
     logInfo("Prune by time complete.")
     return remainingOffers
 
-def finishJobFinderCycle(flexHeaders, startTimestamp, endTimestamp, acceptedOffers, desiredStartHour, desiredEndHour, desiredLocations):
+def finishJobFinderCycle(flexHeaders, startTimestamp, endTimestamp, acceptedOffers, desiredStartHour, desiredEndHour):
     elapsedTime = (endTimestamp - startTimestamp)
     acceptedOffers = pruneOffersByTime(flexHeaders, acceptedOffers, desiredStartHour, desiredEndHour)
-    acceptedOffers = pruneOffersByLocation(flexHeaders, acceptedOffers, desiredLocations)
     logInfo(f"Accepted {len(acceptedOffers)} offers in {elapsedTime} seconds.")
     return 
 
-def findJobs(username, password, desiredStartHour, desiredEndHour, desiredLocations):
+def isValidOffer(offer, desiredStartHour, desiredEndHour):
+    endHour = datetime.datetime.fromtimestamp(offer.get("expirationDate")).hour
+    if (endHour < desiredStartHour or endHour > desiredEndHour):
+        return False
+    else:
+        return True
+
+def findJobs(username, password, desiredStartHour, desiredEndHour):
     flexHeaders = getFlexHeaders(username, password)
     retries = 0
     acceptedOffers = []
@@ -165,11 +172,12 @@ def findJobs(username, password, desiredStartHour, desiredEndHour, desiredLocati
         if (offersResponse.status_code == 200):
             currentOffers = offersResponse.json().get("offerList")
             for offer in currentOffers:
-                if (acceptOffer(flexHeaders, offer.get("offerId"))):
-                    acceptedOffers.append(offer)
+                if(isValidOffer(offer, desiredStartHour, desiredEndHour)):                        
+                    if (acceptOffer(flexHeaders, offer.get("offerId"))):
+                        acceptedOffers.append(offer)
             retries += 1
         else:
             logError(offersResponse.json())
-            return finishJobFinderCycle(flexHeaders, startTimestamp, time.time(), accaptedOffers, desiredStartHour, desiredEndHour, desiredLocations)
+            return finishJobFinderCycle(flexHeaders, startTimestamp, time.time(), acceptedOffers, desiredStartHour, desiredEndHour)
     logInfo("Job search cycle ending...")
-    return finishJobFinderCycle(flexHeaders, startTimestamp, time.time(), accaptedOffers, desiredStartHour, desiredEndHour, desiredLocations)
+    return finishJobFinderCycle(flexHeaders, startTimestamp, time.time(), acceptedOffers, desiredStartHour, desiredEndHour)
