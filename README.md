@@ -9,3 +9,15 @@ These clickers require the drivers to stare at their phones all day long and wat
 **Note**: I reverse-engineered the Amazon Flex API by running Charles Proxy on my iPhone whilst doing a variety of things on the Flex app (e.g logging in, searching for jobs, accepting a job, declining a job). You can do the same if you need to update the reverse engineered API in this program.
 
 **Disclaimer**: I tried to run this on a AWS server and it didn't work, possibly because Flex blocks all incoming connections from data centers to prevent large scale automation. But perhaps it'll work out of data centers not owned by AWS. 
+
+## Usage ##
+
+1. Clone the repo to the machine you will be using to run the program.
+2. Install dependencies
+3. Run `python app.py` and follow the prompts. For your desired warehouses that you wish to retrieve jobs from, make sure to enter the INTERNAL ID's of the warehouses. Here is an example:
+
+"UNY1": "2": ,
+"C077": "721061b3-a4f1-4244-99b3-a453c9cb864e",
+"C506": "acf06702-57ba-47f3-a34f-19e536a69fc0"
+
+If you want to only search for jobs in the UNY1 warehouse, you would type in "2". For UNY1 and C506 warehouses, "2,acf06702-57ba-47f3-a34f-19e536a69fc0". All three of these example warehouses are located in New York, I believe. For other warehouses, you'll have to snoop on requests made by Amazon Flex to get the internal warehouse id.
