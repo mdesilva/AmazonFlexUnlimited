@@ -1,37 +1,21 @@
-from flask import Flask, request, make_response
-from system import startService, stopService, getLogs
-app = Flask(__name__)
+from FlexJobFinder import FlexJobFinder
+from getpass import getpass
 
-@app.route("/", methods=["GET"])
-def index():
-    return "Flex utility server running"
-
-@app.route("/start", methods=["POST"])
-def startServiceRoute():
-    username = request.form["username"]
-    try:
-        startService(username)
-        return make_response("Service started", 200)
-    except Exception as e:
-        print(e)
-        return make_response("An error occurred when starting the service", 500)
-
-@app.route("/stop", methods=["POST"])
-def stopServiceRoute():
-    username = request.form["username"]
-    try:
-        stopService(username)
-        return make_response("Service stopped", 200)
-    except Exception as e:
-        print(e)
-        return make_response("An error occurred when stopping the service", 500)
-
-@app.route("/logs", methods=["GET"])
-def getLogsRoute():
-    username = request.args.get("username")
-    try:
-        return make_response(getLogs(username), 200)
-    except Exception as e:
-        print(e)
-        return make_response("An error occurred.", 500)
-        
+if __name__ == "__main__":
+    print("***Amazon Flex Unlimited v2*** \n")
+    username = input("Amazon Flex Username: ")
+    password = getpass.getpass("Amazon Flex Password: ")
+    desiredWarehouses = input("List of desired warehouses to pick jobs from (comma-separated, no spaces): ").split(",")
+    desiredStartHour = input("Desired start hour in military (24hr) format: ")
+    desiredEndHour = input("Desired end hour in military (24hr) format: ")
+    retryLimit = input("Retry limit (number of refreshes): ")
+    jobFinder = FlexJobFinder(
+        username=username,
+        password=password,
+        desiredWarehouses=desiredWarehouses,
+        desiredStartHour=desiredStartHour,
+        desiredEndHour=desiredEndHour,
+        retryLimit=retryLimit
+        )
+    jobFinder.run()
+    

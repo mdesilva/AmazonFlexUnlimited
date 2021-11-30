@@ -1,4 +1,2 @@
-env/*
 __pycache__/*
-.vscode/*
-creds.py
+env/*
