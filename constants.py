@@ -25,8 +25,11 @@ routes = {
     "ForfeitOffer": "https://flex-capacity-na.amazon.com/schedule/blocks/"
 }
 
-FlexLocations = {
-     "2": "UNY1",
-     "721061b3-a4f1-4244-99b3-a453c9cb864e": "C077",
-     "acf06702-57ba-47f3-a34f-19e536a69fc0": "C506"
-}
+"""
+Example Amazon Flex warehouse locations
+external id to interal id mapping
+
+"UNY1": "2": ,
+"C077": "721061b3-a4f1-4244-99b3-a453c9cb864e",
+"C506": "acf06702-57ba-47f3-a34f-19e536a69fc0": 
+"""
