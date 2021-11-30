@@ -1,12 +1,13 @@
 from requests.models import Response
 from Offer import Offer
+from Log import Log
 import constants
 import requests
 import datetime
 import time
-from Log import Log
+import sys
 
-class FlexJobFinder:
+class FlexUnlimited:
 
     def __init__(self, username, password, desiredWarehouses, desiredStartHour, desiredEndHour, retryLimit) -> None:
         self.username = username
@@ -56,8 +57,13 @@ class FlexJobFinder:
             },
             "requested_token_type": ["bearer", "mac_dms", "website_cookies"]
         }
-        response = requests.post(constants.routes.get("GetAuthToken"), headers=constants.headers.get("AmazonApiRequest"), json=payload).json()
-        return response.get("response").get("success").get("tokens").get("bearer").get("access_token")
+        try:
+            response = requests.post(constants.routes.get("GetAuthToken"), headers=constants.headers.get("AmazonApiRequest"), json=payload).json()
+            return response.get("response").get("success").get("tokens").get("bearer").get("access_token")
+        except:
+            Log.error("Unable to authenticate to Amazon Flex. Please provide a valid Amazon Flex username and password.")
+            sys.exit()
+
     
     def __getAmzDate(self) -> str:
         """
@@ -100,6 +106,7 @@ class FlexJobFinder:
             self.__acceptOffer(offer)
     
     def run(self):
+        Log.info("Starting job search...")
         while(self.__retryCount < self.retryLimit):
             offersResponse = self.__getOffers()
             if (offersResponse.status_code == 200):
