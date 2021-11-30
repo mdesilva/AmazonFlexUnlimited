@@ -1,4 +1,4 @@
-from FlexUnlimited import FlexUnlimited
+from lib.FlexUnlimited import FlexUnlimited
 from getpass import getpass
 
 if __name__ == "__main__":

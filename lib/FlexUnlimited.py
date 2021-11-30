@@ -1,13 +1,39 @@
 from requests.models import Response
-from Offer import Offer
-from Log import Log
-import constants
+from lib.Offer import Offer
+from lib.Log import Log
 import requests
 import datetime
 import time
 import sys
 
 class FlexUnlimited:
+
+    allHeaders = {
+    "AmazonApiRequest": {
+        "x-amzn-identity-auth-domain": "api.amazon.com",
+        "User-Agent": "AmazonWebView/Amazon Flex/0.0/iOS/13.6/iPhone"
+    },
+    "FlexCapacityRequest": {
+        "Accept": "application/json",
+        "x-amz-access-token": None,
+        "Authorization": "RABBIT3-HMAC-SHA256 SignedHeaders=x-amz-access-token;x-amz-date,Signature=13956353d663d0e0285b9fe033600f6aa349141b4927b8f00dc4d8688803fe22",
+        "X-Amz-Date": None,
+        "Accept-Encoding": "gzip, deflate, br",
+        "x-flex-instance-id": "BEEBE19A-FF23-47C5-B1D2-21507C831580",
+        "Accept-Language": "en-US",
+        "Content-Type": "application/json",
+        "User-Agent":  "iOS/13.6 (iPhone Darwin) Model/iPhone Platform/iPhone12,1 RabbitiOS/2.63.1",
+        "Connection": "keep-alive",
+        "Cookie": 'at-main="Atza|IwEBID6-c-dyE3qRaNz-TFhETWU5uiyXXekimNY3tVY12ai0kq1S0hluo9IaJWlGuH-7fgPyimbyvWFtPPxTjjS8aurbzzEJhAW0MsIHJYYYwZEEQIWyKsaW82olcMjKVmCZdy7hkxANRiNLioEVcwQvDPLtrVGijRoKspT1zpHULgG9Q2jxiDMxaht974DoChDYpn_6bbozrPDM_HMhENRqEW6ntnUjUNa9Siv9fxyBJma0AbMFqxFpdZAlCwjhnOTiWvc"; sess-at-main="HaUexuByh5iTAwNf0oNIlyTraGUTR1BJCf5Qc+CWuGg="; session-id=141-6691796-2206425; ubid-main=130-2521667-2032303; x-main="wP5g2jxnzyFZW1RSW66zx@tF9SegMprjUpUjp6nrMaIdSz99EUE3ZaT7UEdwli5i"'
+    },
+}
+
+    routes = {
+        "GetOffers": "https://flex-capacity-na.amazon.com/GetOffersForProviderPost",
+        "AcceptOffer": "https://flex-capacity-na.amazon.com/AcceptOffer",
+        "GetAuthToken": "https://api.amazon.com/auth/register",
+        "ForfeitOffer": "https://flex-capacity-na.amazon.com/schedule/blocks/"
+    }
 
     def __init__(self, username, password, desiredWarehouses, desiredStartHour, desiredEndHour, retryLimit) -> None:
         self.username = username
@@ -19,7 +45,7 @@ class FlexUnlimited:
         self.__retryCount = 0
         self.__acceptedOffers = []
         self.__startTimestamp = time.time()
-        self.__requestHeaders = constants.headers.get("FlexCapacityRequest")
+        self.__requestHeaders = FlexUnlimited.allHeaders.get("FlexCapacityRequest")
         self.__requestHeaders["x-amz-access-token"] = self.__getFlexRequestAuthToken()
 
 
@@ -58,9 +84,10 @@ class FlexUnlimited:
             "requested_token_type": ["bearer", "mac_dms", "website_cookies"]
         }
         try:
-            response = requests.post(constants.routes.get("GetAuthToken"), headers=constants.headers.get("AmazonApiRequest"), json=payload).json()
+            response = requests.post(FlexUnlimited.routes.get("GetAuthToken"), headers=FlexUnlimited.allHeaders.get("AmazonApiRequest"), json=payload).json()
             return response.get("response").get("success").get("tokens").get("bearer").get("access_token")
-        except:
+        except Exception as e:
+            Log.error(e)
             Log.error("Unable to authenticate to Amazon Flex. Please provide a valid Amazon Flex username and password.")
             sys.exit()
 
@@ -80,7 +107,7 @@ class FlexUnlimited:
         """
         self.__requestHeaders["X-Amz-Date"] = self.__getAmzDate()
         return requests.post(
-            constants.routes.get("GetOffers"), 
+            FlexUnlimited.routes.get("GetOffers"), 
             headers=self.__requestHeaders, 
             json= { 
                 "serviceAreaIds": ["2"],
@@ -90,7 +117,7 @@ class FlexUnlimited:
     def __acceptOffer(self, offer: Offer):
         self.__requestHeaders["X-Amz-Date"] = self.__getAmzDate()
         request = requests.post(
-            constants.routes.get("AcceptOffer"), 
+            FlexUnlimited.routes.get("AcceptOffer"), 
             headers=self.__requestHeaders,
             json={"offerId": offer.id})
         if (request.status_code == 200):
