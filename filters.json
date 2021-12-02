@@ -15,7 +15,7 @@
   "useTwilio": true,
   "twilioFilters": {
     "twilioAcctSID": "ACfd5db8aa4ae68f71a3c79cef7ea30ffa",
-    "twilioAuthToken": "30539e6e2dea611d5a4c5688da4bad35",
+    "twilioAuthToken": "",
     "twilioFromNumber": "+18304295656",
     "twilioToNumber": "+13364086275"
   }
