@@ -1,35 +1,13 @@
 from requests.models import Response
 from lib.Offer import Offer
 from lib.Log import Log
-import requests, time, sys, json
+import requests, time, os, sys, json
 from datetime import datetime
+
 try:
   from twilio.rest import Client
 except:
   pass
-
-
-def __getFilters(fileName):
-  with open(fileName) as f:
-    filters = json.load(f)
-    minPay = filters['flexFilters']['minBlockRate']
-    arrivalBuffer = filters['flexFilters']['arrivalBuffer']
-    desiredLocation = filters['flexFilters']['desiredLocation']
-    desiredStartHour = filters['flexFilters']['desiredStartTime']
-    desiredEndHour = filters['flexFilters']['desiredEndTime']
-    retryLimit = filters['flexFilters']['retryLimit']
-
-    if filters['useTwilio']:
-      acct_sid = filters['twilioFilters']['twilioAcctSID']
-      authToken = filters['twilioFilters']['twilioAuthToken']
-      fromNumber = filters['twilioFilters']['twilioFromNumber']
-      toNumber = filters['twilioFilters']['twilioToNumber']
-    else:
-      acct_sid, authToken, fromNumber, toNumber = None, None, None, None
-
-  return (minPay, arrivalBuffer, desiredLocation, desiredStartHour, desiredEndHour,
-          retryLimit, acct_sid, authToken, fromNumber, toNumber)
-
 
 class FlexUnlimited:
   allHeaders = {
@@ -69,43 +47,40 @@ class FlexUnlimited:
     "ForfeitOffer": "https://flex-capacity-na.amazon.com/schedule/blocks/"
   }
 
-  FlexLocations = {
-    '2a13b39b-2238-4cb3-aa11-99ae1ea78172': 'Elkridge MD (SMD1/VMD1) - Sub Same-Day',
-    'Elkridge MD (SMD1/VMD1) - Sub Same-Day': "2a13b39b-2238-4cb3-aa11-99ae1ea78172",
-    '18': 'Canton - (UMD1) Prime Now',
-    'Canton - (UMD1) Prime Now': '18',
-    '47d2658a-568d-4f42-84dc-55e41b39de96': 'Hanover - (DBA2) AMZL',
-    'Hanover - (DBA2) AMZL': '47d2658a-568d-4f42-84dc-55e41b39de96',
-    'ef813098-fa34-4f76-992b-bf580626c449': 'Hanover (DMD6) - Amazon.com',
-    'Hanover (DMD6) - Amazon.com': 'ef813098-fa34-4f76-992b-bf580626c449',
-    '467735da-dc81-4bfd-9a5c-4f21b82b8d0a': 'Hanover (DBA8) - Amazon.com',
-    'Hanover (DBA8) - Amazon.com': '467735da-dc81-4bfd-9a5c-4f21b82b8d0a'
-  }
+  def __init__(self) -> None:
+    try:
+      with open("config.json") as configFile:
+        config = json.load(configFile)
+        self.username = os.environ['AMZNFLEXUSERNAME']
+        self.password = os.environ["AMZNFLEXPWD"]
+        self.desiredWarehouses = config["desiredWarehouses"]  # list of warehouse ids
+        self.minBlockRate = config["minBlockRate"]
+        self.arrivalBuffer = config["arrivalBuffer"]
+        self.desiredStartHour = config["desiredStartHour"]  # start hour in military time
+        self.desiredEndHour = config["desiredEndHour"]  # end hour in military time
+        self.retryLimit = config["retryLimit"]  # number of jobs retrieval requests to perform
+        self.twilioFromNumber = config["twilioFromNumber"]
+        self.twilioToNumber = config["twilioToNumber"]
+        self.__retryCount = 0
+        self.__acceptedOffers = []
+        self.__startTimestamp = time.time()
+        self.__requestHeaders = FlexUnlimited.allHeaders.get("FlexCapacityRequest")
+        self.__requestHeaders["x-amz-access-token"] = self.__getFlexRequestAuthToken()
 
-  def __init__(self, username, password, desiredWarehouses, minBlockRate, arrivalBuffer, desiredStartHour,
-               desiredEndHour, retryLimit, twilioAcctSid, twilioAuthToken, twilioFromNumber, twilioToNumber) -> None:
-    self.username = username
-    self.password = password
-    self.desiredWarehouses = desiredWarehouses  # list of warehouse ids
-    self.minBlockRate = minBlockRate
-    self.arrivalBuffer = arrivalBuffer
-    self.desiredStartHour = desiredStartHour  # start hour in military time
-    self.desiredEndHour = desiredEndHour  # end hour in military time
-    self.retryLimit = retryLimit  # number of jobs retrieval requests to perform
-    self.twilioAcctSid = twilioAcctSid
-    self.twilioAuthToken = twilioAuthToken
-    self.twilioFromNumber = twilioFromNumber
-    self.twilioToNumber = twilioToNumber
-    self.__retryCount = 0
-    self.__acceptedOffers = []
-    self.__startTimestamp = time.time()
-    self.__requestHeaders = FlexUnlimited.allHeaders.get("FlexCapacityRequest")
-    self.__requestHeaders["x-amz-access-token"] = self.__getFlexRequestAuthToken()
+        twilioAcctSid = config["twilioAcctSid"] 
+        twilioAuthToken = config["twilioAuthToken"]
 
-    if self.twilioAcctSid:
-      self.twilioClient = Client(self.twilioAcctSid, self.twilioAuthToken)
-    else:
-      self.twilioClient = None
+        if twilioAcctSid != "" and twilioAuthToken != "" and self.twilioFromNumber != "" and self.twilioToNumber != "":
+          self.twilioClient = Client(twilioAcctSid, twilioAuthToken)
+        else:
+          self.twilioClient = None
+    except KeyError as nullKey:
+      Log.error(f'{nullKey} was not set. Please setup FlexUnlimited as described in the README.')
+      sys.exit()
+    except FileNotFoundError:
+      Log.error("Config file not found. Ensure a properly formatted 'config.json' file exists in the root directory.")
+      sys.exit()
+
 
   def __getFlexRequestAuthToken(self) -> str:
     """
@@ -149,7 +124,6 @@ class FlexUnlimited:
                                headers=FlexUnlimited.allHeaders.get("AmazonApiRequest"), json=payload).json()
       return response.get("response").get("success").get("tokens").get("bearer").get("access_token")
     except Exception as e:
-      Log.error(e)
       Log.error("Unable to authenticate to Amazon Flex. Please provide a valid Amazon Flex username and password.")
       sys.exit()
 
@@ -167,7 +141,7 @@ class FlexUnlimited:
         Returns:
         Offers response object
         """
-    self.__requestHeaders["X-Amz-Date"] = self.__getAmzDate()
+    self.__requestHeaders["X-Amz-Date"] = FlexUnlimited.__getAmzDate()
     return requests.post(
       FlexUnlimited.routes.get("GetOffers"),
       headers=self.__requestHeaders,
@@ -186,74 +160,37 @@ class FlexUnlimited:
 
     if request.status_code == 200:
       self.__acceptedOffers.append(offer)
+      if self.twilioClient is not None:
+          self.twilioClient.messages.create(
+            to=self.twilioToNumber,
+            from_=self.twilioFromNumber,
+            body=offer.toString())
       Log.info(f"Successfully accepted offer {offer.id}")
-      return True
-    Log.error(f"Unable to accept offer {offer.id}. Request returned status code {request.status_code}")
-    return False
+    else:
+      Log.error(f"Unable to accept offer {offer.id}. Request returned status code {request.status_code}")
 
   def __processOffer(self, offer: Offer):
-    attemptAccept = True
     offerStartHour = offer.expirationDate.hour
 
     if self.desiredWarehouses is not None:
       if offer.location not in self.desiredWarehouses:
-        attemptAccept = False
+        return
 
-    if attemptAccept and self.minBlockRate:
+    if self.minBlockRate:
       if self.minBlockRate > offer.blockRate:
-        attemptAccept = False
+        return
 
-    if attemptAccept and self.arrivalBuffer:
+    if self.arrivalBuffer:
       deltaTime = (offer.expirationDate - datetime.now()).seconds / 3600
-
       if deltaTime < self.arrivalBuffer:
-        attemptAccept = False
+        return
 
     if self.desiredStartHour is not None and self.desiredEndHour is not None:
       if not (self.desiredStartHour < offerStartHour < self.desiredEndHour):
-        attemptAccept = False
+        return
 
-    if attemptAccept:
-      if self.__acceptOffer(offer):
-        smsBody = self.__createAndDisplayOffer(offer)
+    self.__acceptOffer(offer)
 
-        if self.twilioClient is not None:
-          self.twilioClient.messages.create(
-            to=self.twilioToNumber,
-            from_=self.twilioFromNumber,
-            body=smsBody
-          )
-
-  @staticmethod
-  def __createAndDisplayOffer(offer: Offer):
-
-    blockDuration = (offer.endTime - offer.expirationDate).seconds / 3600
-
-    body = 'Location: ' + offer.location + '\n'
-    body += 'Date: ' + str(offer.expirationDate.month) + '/' + str(offer.expirationDate.day) + '\n'
-    body += 'Pay: ' + str(offer.blockRate) + '\n'
-
-    if blockDuration == 1:
-      body += 'Block Duration: ' + str(blockDuration) + 'hour\n'
-    else:
-      body += 'Block Duration: ' + str(blockDuration) + 'hours\n'
-
-    if not offer.expirationDate.minute:
-      body += 'Start time: ' + str(offer.expirationDate.hour) + '00\n'
-    elif offer.expirationDate.minute < 10:
-      body += 'Start time: ' + str(offer.expirationDate.hour) + '0' + str(offer.expirationDate.minute) + '\n'
-    else:
-      body += 'Start time: ' + str(offer.expirationDate.hour) + str(offer.expirationDate.minute) + '\n'
-
-    if not offer.endTime.minute:
-      body += 'End time: ' + str(offer.endTime.hour) + '00\n'
-    elif offer.endTime.minute < 10:
-      body += 'End time: ' + str(offer.endTime.hour) + '0' + str(offer.endTime.minute) + '\n'
-    else:
-      body += 'End time: ' + str(offer.endTime.hour) + str(offer.endTime.minute) + '\n'
-
-    print(body)
-    return body
 
   def run(self):
     Log.info("Starting job search...")

@@ -1,0 +1,12 @@
+{
+  "minBlockRate": 100,
+  "arrivalBuffer": 2,
+  "desiredWarehouses": [],
+  "desiredStartHour": 0,
+  "desiredEndHour": 23,
+  "retryLimit": 800,
+  "twilioAcctSID": "",
+  "twilioAuthToken": "",
+  "twilioFromNumber": "",
+  "twilioToNumber": ""
+}
