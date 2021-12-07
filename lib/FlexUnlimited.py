@@ -9,6 +9,7 @@ try:
 except:
   pass
 
+
 class FlexUnlimited:
   allHeaders = {
     "AmazonApiRequest": {
@@ -70,7 +71,7 @@ class FlexUnlimited:
         self.__requestHeaders = FlexUnlimited.allHeaders.get("FlexCapacityRequest")
         self.__requestHeaders["x-amz-access-token"] = self.__getFlexRequestAuthToken()
 
-        twilioAcctSid = config["twilioAcctSid"] 
+        twilioAcctSid = config["twilioAcctSid"]
         twilioAuthToken = config["twilioAuthToken"]
 
         if twilioAcctSid != "" and twilioAuthToken != "" and self.twilioFromNumber != "" and self.twilioToNumber != "":
@@ -83,7 +84,6 @@ class FlexUnlimited:
     except FileNotFoundError:
       Log.error("Config file not found. Ensure a properly formatted 'config.json' file exists in the root directory.")
       sys.exit()
-
 
   def __getFlexRequestAuthToken(self) -> str:
     """
@@ -145,13 +145,25 @@ class FlexUnlimited:
         Offers response object
         """
     self.__requestHeaders["X-Amz-Date"] = FlexUnlimited.__getAmzDate()
-    return requests.post(
-      FlexUnlimited.routes.get("GetOffers"),
-      headers=self.__requestHeaders,
-      json={
-        "serviceAreaIds": ["2"],
-        "apiVersion": "V2"
-      })
+    if self.desiredWarehouses:
+      return requests.post(
+        FlexUnlimited.routes.get("GetOffers"),
+        headers=self.__requestHeaders,
+        json={
+          "filters": {
+            "serviceAreaFilter": self.desiredWarehouses,
+          },
+          "serviceAreaIds": ["2"],
+          "apiVersion": "V2"
+        })
+    else:
+      return requests.post(
+        FlexUnlimited.routes.get("GetOffers"),
+        headers=self.__requestHeaders,
+        json={
+          "serviceAreaIds": ["2"],
+          "apiVersion": "V2"
+        })
 
   def __acceptOffer(self, offer: Offer):
     self.__requestHeaders["X-Amz-Date"] = self.__getAmzDate()
@@ -164,20 +176,16 @@ class FlexUnlimited:
     if request.status_code == 200:
       self.__acceptedOffers.append(offer)
       if self.twilioClient is not None:
-          self.twilioClient.messages.create(
-            to=self.twilioToNumber,
-            from_=self.twilioFromNumber,
-            body=offer.toString())
+        self.twilioClient.messages.create(
+          to=self.twilioToNumber,
+          from_=self.twilioFromNumber,
+          body=offer.toString())
       Log.info(f"Successfully accepted offer {offer.id}")
     else:
       Log.error(f"Unable to accept offer {offer.id}. Request returned status code {request.status_code}")
 
   def __processOffer(self, offer: Offer):
     offerStartHour = offer.expirationDate.hour
-
-    if self.desiredWarehouses is not None:
-      if offer.location not in self.desiredWarehouses:
-        return
 
     if self.minBlockRate:
       if self.minBlockRate > offer.blockRate:
@@ -193,7 +201,6 @@ class FlexUnlimited:
         return
 
     self.__acceptOffer(offer)
-
 
   def run(self):
     Log.info("Starting job search...")
