@@ -54,6 +54,9 @@ class FlexUnlimited:
         self.username = os.environ['AMZNFLEXUSERNAME']
         self.password = os.environ["AMZNFLEXPWD"]
         self.desiredWarehouses = config["desiredWarehouses"]  # list of warehouse ids
+        if len(self.desiredWarehouses) < 1:
+          Log.error("Please set at least one warehouse to search for jobs at.")
+          sys.exit()
         self.minBlockRate = config["minBlockRate"]
         self.arrivalBuffer = config["arrivalBuffer"]
         self.desiredStartHour = config["desiredStartHour"]  # start hour in military time
