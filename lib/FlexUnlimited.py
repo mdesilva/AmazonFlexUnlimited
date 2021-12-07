@@ -54,10 +54,7 @@ class FlexUnlimited:
         config = json.load(configFile)
         self.username = os.environ['AMZNFLEXUSERNAME']
         self.password = os.environ["AMZNFLEXPWD"]
-        self.desiredWarehouses = config["desiredWarehouses"]  # list of warehouse ids
-        if len(self.desiredWarehouses) < 1:
-          Log.error("Please set at least one warehouse to search for jobs at.")
-          sys.exit()
+        self.desiredWarehouses = config["desiredWarehouses"] if len(config["desiredWarehouses"]) >= 1 else None  # list of warehouse ids
         self.minBlockRate = config["minBlockRate"]
         self.arrivalBuffer = config["arrivalBuffer"]
         self.desiredStartHour = config["desiredStartHour"]  # start hour in military time
@@ -139,31 +136,24 @@ class FlexUnlimited:
 
   def __getOffers(self) -> Response:
     """
-        Get job offers.
+    Get job offers.
     
-        Returns:
-        Offers response object
-        """
+    Returns:
+    Offers response object
+    """
     self.__requestHeaders["X-Amz-Date"] = FlexUnlimited.__getAmzDate()
-    if self.desiredWarehouses:
-      return requests.post(
-        FlexUnlimited.routes.get("GetOffers"),
-        headers=self.__requestHeaders,
-        json={
-          "filters": {
-            "serviceAreaFilter": self.desiredWarehouses,
-          },
-          "serviceAreaIds": ["2"],
-          "apiVersion": "V2"
-        })
-    else:
-      return requests.post(
-        FlexUnlimited.routes.get("GetOffers"),
-        headers=self.__requestHeaders,
-        json={
-          "serviceAreaIds": ["2"],
-          "apiVersion": "V2"
-        })
+    requestBody = {
+      "serviceAreaIds": ["2"], 
+      "apiVersion": "V2"
+    }
+    if self.desiredWarehouses is not None:
+      requestBody["filters"] = {
+        "serviceAreaFilter": self.desiredWarehouses
+      }
+    return requests.post(
+      FlexUnlimited.routes.get("GetOffers"),
+      headers=self.__requestHeaders,
+      json=requestBody)
 
   def __acceptOffer(self, offer: Offer):
     self.__requestHeaders["X-Amz-Date"] = self.__getAmzDate()
