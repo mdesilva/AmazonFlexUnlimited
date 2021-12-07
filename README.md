@@ -12,7 +12,7 @@ This is an attempt to automate picking up Amazon Flex driver jobs. I attempted t
 1. Clone the repo to the machine you will be using to run the program (machine should be connected to Internet by wire for best results).
 2. Install dependencies
 3. Setup the desired Amazon Flex user account for which jobs will be searched for by running `export AMZNFLEXUSERNAME=$username` & `export AMZNFLEXPWD=$password`, where `$username` and `$password` is the Amazon Flex username and password.
-4. Modify `config.json` to meet your job search requirements. It already comes with some defaults; the only field you MUST fill out is `desiredWarehouses`. `desiredWarehouses` is a list of strings of all the warehouses ids of the warehouses you'd like to search for jobs at; these must be internal warehouse ids. For some example warehouses, refer to the table below.
+4. Modify `config.json` to meet your job search requirements. It already comes with some defaults; the only field you MUST fill out is `desiredWarehouses`. `desiredWarehouses` is a list of strings of all the warehouses ids of the warehouses you'd like to search for jobs at; **these must be internal warehouse ids**. For some example warehouses, refer to the table below.
 
 | Warehouse External ID | Warehouse Internal ID |
 | --------------------- | ---------------------- |
