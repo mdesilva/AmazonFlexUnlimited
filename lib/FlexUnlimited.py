@@ -178,7 +178,7 @@ class FlexUnlimited:
     offerStartHour = offer.expirationDate.hour
 
     if self.minBlockRate:
-      if self.minBlockRate > offer.blockRate:
+      if self.minBlockRate < offer.blockRate:
         return
 
     if self.arrivalBuffer:
