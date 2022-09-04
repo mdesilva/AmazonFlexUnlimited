@@ -34,3 +34,9 @@ If you want to only search for jobs in the **UNY1** warehouse, `desiredWarehouse
 
 5. Optionally, setup SMS notifications of Amazon Flex job acceptances by filling out the `twilio` parameters in `config.json`.
 6. Run `python app.py`.
+
+## Troubleshooting ##
+
+- Unable to Authenticate
+   If you followed the instructions above and receive the "Unable to Authenticate" error, try the following:
+   1. 
