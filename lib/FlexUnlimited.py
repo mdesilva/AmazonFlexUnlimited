@@ -45,7 +45,8 @@ class FlexUnlimited:
     "GetOffers": "https://flex-capacity-na.amazon.com/GetOffersForProviderPost",
     "AcceptOffer": "https://flex-capacity-na.amazon.com/AcceptOffer",
     "GetAuthToken": "https://api.amazon.com/auth/register",
-    "ForfeitOffer": "https://flex-capacity-na.amazon.com/schedule/blocks/"
+    "ForfeitOffer": "https://flex-capacity-na.amazon.com/schedule/blocks/",
+    "GetEligibleServiceAreas": "https://flex-capacity-na.amazon.com/eligibleServiceAreas"
   }
 
   def __init__(self) -> None:
@@ -67,6 +68,7 @@ class FlexUnlimited:
         self.__startTimestamp = time.time()
         self.__requestHeaders = FlexUnlimited.allHeaders.get("FlexCapacityRequest")
         self.__requestHeaders["x-amz-access-token"] = self.__getFlexRequestAuthToken()
+        self.serviceAreaIds = self.__getEligibleServiceAreas()
 
         twilioAcctSid = config["twilioAcctSid"]
         twilioAuthToken = config["twilioAuthToken"]
@@ -129,6 +131,13 @@ class FlexUnlimited:
         """
     return datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')
 
+  def __getEligibleServiceAreas(self):
+    self.__requestHeaders["X-Amz-Date"] = FlexUnlimited.__getAmzDate()
+    response = requests.get(
+      FlexUnlimited.routes.get("GetEligibleServiceAreas"),
+      headers=self.__requestHeaders)
+    return response.json().get("serviceAreaIds")
+
   def __getOffers(self) -> Response:
     """
     Get job offers.
@@ -138,7 +147,7 @@ class FlexUnlimited:
     """
     self.__requestHeaders["X-Amz-Date"] = FlexUnlimited.__getAmzDate()
     requestBody = {
-      "serviceAreaIds": ["2"], 
+      "serviceAreaIds": self.serviceAreaIds,
       "apiVersion": "V2"
     }
     if self.desiredWarehouses is not None:
