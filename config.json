@@ -1,4 +1,6 @@
 {
+  "username": "",
+  "password": "",
   "minBlockRate": 100,
   "arrivalBuffer": 2,
   "desiredWarehouses": [],

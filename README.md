@@ -10,12 +10,11 @@ This is an attempt to automate picking up Amazon Flex driver jobs. I attempted t
 ## Usage ##
 
 1. Clone the repo to the machine you will be using to run the program (machine should be connected to Internet by wire for best results).
-2. Install dependencies
-3. Setup the desired Amazon Flex user account for which jobs will be searched for by running `export AMZNFLEXUSERNAME=$username` & `export AMZNFLEXPWD=$password`, where `$username` and `$password` is the Amazon Flex username and password.
-   - Note: Substitute `set` for `export` in Windows environments. 
-4. Modify `config.json` to meet your job search requirements. It already comes with some defaults. Fill out `desiredWarehouses` if you would like to restrict your job search to certain warehouses. Otherwise, leave `desiredWarehouses` as an empty list.
+2. Install dependencies using **pip3**: `pip3 install -r requirements`.
+3. Set `username` and `password` in **config.json**.
+4. Modify the remainder of **config.json** to meet your job search requirements. It already comes with some defaults. Fill out `desiredWarehouses` if you would like to restrict your job search to certain warehouses. Otherwise, leave `desiredWarehouses` as an empty list.
 
-`desiredWarehouses` can be a list of strings of **internal warehouse ids**.
+`desiredWarehouses` must be a list of strings of **internal warehouse ids**.
 For some example warehouses, refer to the table below.
 
 | Warehouse External ID | Warehouse Internal ID |
@@ -32,5 +31,5 @@ For some example warehouses, refer to the table below.
 
 If you want to only search for jobs in the **UNY1** warehouse, `desiredWarehouses` will be `[2]`. For **UNY1** **and** **C506** warehouses, `[2,acf06702-57ba-47f3-a34f-19e536a69fc0]`. For warehouses not in the table above, you'll have to snoop on requests made by the Amazon Flex app to get the internal warehouse id.
 
-5. Optionally, setup SMS notifications of Amazon Flex job acceptances by filling out the `twilio` parameters in `config.json`.
-6. Run `python app.py`.
+5. Optionally, setup SMS notifications of Amazon Flex job acceptances by filling out the `twilio` parameters in  **config.json**.
+6. Run `python3 app.py`.

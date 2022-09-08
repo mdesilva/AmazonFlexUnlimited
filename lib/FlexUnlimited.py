@@ -52,8 +52,8 @@ class FlexUnlimited:
     try:
       with open("config.json") as configFile:
         config = json.load(configFile)
-        self.username = os.environ['AMZNFLEXUSERNAME']
-        self.password = os.environ["AMZNFLEXPWD"]
+        self.username = config["username"]
+        self.password = config["password"]
         self.desiredWarehouses = config["desiredWarehouses"] if len(config["desiredWarehouses"]) >= 1 else None  # list of warehouse ids
         self.minBlockRate = config["minBlockRate"]
         self.arrivalBuffer = config["arrivalBuffer"]
@@ -99,7 +99,7 @@ class FlexUnlimited:
         "app_version": "0.0",
         "device_type": "A3NWHXTQ4EBCZS",
         "os_version": "15.2",
-        "device_serial": "B262D48AC3EA4671B288C20F406821B5",
+        "device_serial": "0000000000000000",
         "device_model": "iPhone",
         "app_name": "Amazon Flex",
         "software_version": "1"
@@ -111,12 +111,7 @@ class FlexUnlimited:
         }
       },
       "user_context_map": {
-        "frc": "AFgQ07+f4rZ1HkMDmsLeD9GlOFoIa9auy7p03s6CSDsZFiskgDYWhSIQyD7S8EUxSMGAGs1gf0e"
-               "\/wlmnvGBZ2Jh7YkvVfXENXnwoQ12acgHysONHR\/oBMWPwNOBg+qY88UlNQ1RXNOv9fgMDJPjr5gvZJs3S5RY9RyAMg7H"
-               "\/sSIEJ9j+TXIE+xnMZrT1lOpEMdQJHV53+pgcJEG2SB4kt8OraJqoZCt7A\/lyWO9RAL1gWlnhEHyEd3"
-               "\/\/t8TNQBKXbjO2G9iFUQs\/s0VqVSchIVzOzT\/BRpe36iFW7XnbGU0N9Q5Y40m+M"
-               "\/kxySQ3h5YWs9kl1PuLGTx3ql1ttSf7nSHLGj342KZJtK3oOjCxVrsjteGRyekpKe6Jagrssjq1QOVNIyRmU428fdl"
-               "\/lWILDAnSFSMZNiOzzQ=="},
+        "frc": ""},
       "requested_token_type": ["bearer", "mac_dms", "website_cookies"]
     }
     try:
