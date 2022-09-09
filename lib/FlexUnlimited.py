@@ -150,10 +150,6 @@ class FlexUnlimited:
       "serviceAreaIds": self.serviceAreaIds,
       "apiVersion": "V2"
     }
-    if self.desiredWarehouses is not None:
-      requestBody["filters"] = {
-        "serviceAreaFilter": self.desiredWarehouses
-      }
     return requests.post(
       FlexUnlimited.routes.get("GetOffers"),
       headers=self.__requestHeaders,
@@ -174,9 +170,9 @@ class FlexUnlimited:
           to=self.twilioToNumber,
           from_=self.twilioFromNumber,
           body=offer.toString())
-      Log.info(f"Successfully accepted offer {offer.id}")
+      Log.info(f"Successfully accepted an offer.")
     else:
-      Log.error(f"Unable to accept offer {offer.id}. Request returned status code {request.status_code}")
+      Log.error(f"Unable to accept an offer. Request returned status code {request.status_code}")
 
   def __processOffer(self, offer: Offer):
     offerStartHour = offer.expirationDate.hour
@@ -192,6 +188,10 @@ class FlexUnlimited:
 
     if self.desiredStartHour is not None and self.desiredEndHour is not None:
       if not (self.desiredStartHour < offerStartHour < self.desiredEndHour):
+        return
+    
+    if self.desiredWarehouses is not None:
+      if offer.location not in self.desiredWarehouses:
         return
 
     self.__acceptOffer(offer)
