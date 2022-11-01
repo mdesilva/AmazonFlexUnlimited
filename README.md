@@ -9,6 +9,7 @@ This is an attempt to automate picking up Amazon Flex driver jobs. I attempted t
 
 ## Usage ##
 
+0. You MUST have python 3 installed. Versions below 3 will not work.  
 1. Clone the repo to the machine you will be using to run the program (machine should be connected to Internet by wire for best results).
 2. Install dependencies using **pip**: `pip install -r requirements.txt`.
 3. Set `username` and `password` in **config.json**.
@@ -32,4 +33,4 @@ For some example warehouses, refer to the table below.
 If you want to only search for jobs in the **UNY1** warehouse, `desiredWarehouses` will be `[2]`. For **UNY1** **and** **C506** warehouses, `[2,acf06702-57ba-47f3-a34f-19e536a69fc0]`. For warehouses not in the table above, you'll have to snoop on requests made by the Amazon Flex app to get the internal warehouse id.
 
 5. Optionally, setup SMS notifications of Amazon Flex job acceptances by filling out the `twilio` parameters in  **config.json**.
-6. Run `python app.py`.
+6. Run `python app.py`. Alternatively, try `python3 app.py`.
