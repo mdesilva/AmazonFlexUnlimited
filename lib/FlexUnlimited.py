@@ -3,6 +3,7 @@ from lib.Offer import Offer
 from lib.Log import Log
 import requests, time, os, sys, json
 from datetime import datetime
+from prettytable import PrettyTable
 
 try:
   from twilio.rest import Client
@@ -46,7 +47,8 @@ class FlexUnlimited:
     "AcceptOffer": "https://flex-capacity-na.amazon.com/AcceptOffer",
     "GetAuthToken": "https://api.amazon.com/auth/register",
     "ForfeitOffer": "https://flex-capacity-na.amazon.com/schedule/blocks/",
-    "GetEligibleServiceAreas": "https://flex-capacity-na.amazon.com/eligibleServiceAreas"
+    "GetEligibleServiceAreas": "https://flex-capacity-na.amazon.com/eligibleServiceAreas",
+    "GetOfferFiltersOptions": "https://flex-capacity-na.amazon.com/getOfferFiltersOptions"
   }
 
   def __init__(self) -> None:
@@ -147,6 +149,18 @@ class FlexUnlimited:
       FlexUnlimited.routes.get("GetEligibleServiceAreas"),
       headers=self.__requestHeaders)
     return response.json().get("serviceAreaIds")
+
+  def getAllServiceAreas(self):
+    self.__requestHeaders["X-Amz-Date"] = FlexUnlimited.__getAmzDate()
+    serviceAreaPoolList = requests.get(
+      FlexUnlimited.routes.get("GetOfferFiltersOptions"),
+      headers=self.__requestHeaders
+      ).json().get("serviceAreaPoolList")
+    serviceAreasTable = PrettyTable()
+    serviceAreasTable.field_names = ["Service Area Name", "Service Area ID"]
+    for serviceArea in serviceAreaPoolList:
+      serviceAreasTable.add_row([serviceArea["serviceAreaName"], serviceArea["serviceAreaId"]])
+    return serviceAreasTable
 
   def __getOffers(self) -> Response:
     """
