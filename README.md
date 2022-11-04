@@ -5,7 +5,9 @@ This is an attempt to automate picking up Amazon Flex driver jobs. I attempted t
 
 **Note**: I reverse-engineered the Amazon Flex API by running Charles Proxy on my iPhone whilst doing a variety of things on the Flex app (e.g logging in, searching for jobs, accepting a job, declining a job). You can do the same if you need to update the reverse engineered API in this program.
 
-**Disclaimer**: I tried to run this on a AWS server and it didn't work, possibly because Flex blocks all incoming connections from data centers to prevent large scale automation. But perhaps it'll work out of data centers not owned by AWS. 
+**Disclaimer 1**: Run this program at your own risk. I am not responsible for Flex account termination or penalties imposed by Amazon as a result of using this program. 
+
+**Disclaimer 2**: I tried to run this on a AWS server and it didn't work, possibly because Flex blocks all incoming connections from data centers to prevent large scale automation. But perhaps it'll work out of data centers not owned by AWS. 
 
 ## Usage ##
 
