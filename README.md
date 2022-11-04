@@ -13,24 +13,21 @@ This is an attempt to automate picking up Amazon Flex driver jobs. I attempted t
 1. Clone the repo to the machine you will be using to run the program (machine should be connected to Internet by wire for best results).
 2. Install dependencies using **pip**: `pip install -r requirements.txt`.
 3. Set `username` and `password` in **config.json**.
-4. Modify the remainder of **config.json** to meet your job search requirements. It already comes with some defaults. Fill out `desiredWarehouses` if you would like to restrict your job search to certain warehouses. Otherwise, leave `desiredWarehouses` as an empty list.
+4. Modify the remainder of **config.json** to meet your job search requirements. It already comes with some defaults. Fill out `desiredWarehouses` if you would like to restrict your job search to certain warehouses. If you choose this option, 
+`desiredWarehouses` must be a list of strings of **internal warehouse ids**. Otherwise, leave `desiredWarehouses` as an empty list.
 
-`desiredWarehouses` must be a list of strings of **internal warehouse ids**.
-For some example warehouses, refer to the table below.
+To determine the internal warehouse ids of warehouses you are eligible for, run the following command:
+`python3 app.py getAllServiceAreas` OR `python3 app.py --w`
 
-| Warehouse External ID | Warehouse Internal ID |
-| --------------------- | ---------------------- |
-|  UNY1 | 2 |
-| C077| 721061b3-a4f1-4244-99b3-a453c9cb864e|
-| C506| acf06702-57ba-47f3-a34f-19e536a69fc0|
-| Elkridge MD (SMD1/VMD1) - Sub Same-Day' | 2a13b39b-2238-4cb3-aa11-99ae1ea78172 |
-| Canton - (UMD1) Prime Now | 18 |
-| Hanover - (DBA2) AMZL | 47d2658a-568d-4f42-84dc-55e41b39de96 |
-| Hanover (DMD6) - Amazon.com | ef813098-fa34-4f76-992b-bf580626c449 |
-| Hanover (DBA8) - Amazon.com | 467735da-dc81-4bfd-9a5c-4f21b82b8d0a |
+Here you will get a table of all the service areas (warehouses) that you are eligible for. The left column states the service area name, and the right column is the internal warehouse id used by Amazon. Copy all the service area ids you want to restrict your search to as strings into the **desiredWarehouses** field into the config.json. 
 
-
-If you want to only search for jobs in the **UNY1** warehouse, `desiredWarehouses` will be `[2]`. For **UNY1** **and** **C506** warehouses, `[2,acf06702-57ba-47f3-a34f-19e536a69fc0]`. For warehouses not in the table above, you'll have to snoop on requests made by the Amazon Flex app to get the internal warehouse id.
-
+e.g
+```
+{
+...
+"desiredWarehouses": ["9c332725-c1be-405f-87c5-e7def58595f6", "5fa41ec8-44ae-4e91-8e48-7be008d72e8a"]],
+...
+}
+```
 5. Optionally, setup SMS notifications of Amazon Flex job acceptances by filling out the `twilio` parameters in  **config.json**.
 6. Run `python app.py`. Alternatively, try `python3 app.py`.
