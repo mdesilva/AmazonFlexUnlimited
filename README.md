@@ -31,3 +31,17 @@ e.g
 ```
 5. Optionally, setup SMS notifications of Amazon Flex job acceptances by filling out the `twilio` parameters in  **config.json**.
 6. Run `python app.py`. Alternatively, try `python3 app.py`.
+
+## Troubleshooting ##
+
+- Unable to authenticate to Amazon Flex. Please try completing the two step verification challenge at (url)
+
+Click on the url and complete the two step verification challenge. After you get to a page that says:
+
+Looking for Something?
+We're sorry. The Web address you entered is not a functioning page on our site
+
+You have successfully completed the two step verification challenge. Go back to your terminal and re-run the program.
+
+
+
