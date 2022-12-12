@@ -1,14 +1,18 @@
 {
   "username": "",
   "password": "",
-  "minBlockRate": 0,
-  "arrivalBuffer": 2,
+  "minBlockRate": 200,
+  "minPayRatePerHour": 43,
+  "arrivalBuffer": 45,
   "desiredWarehouses": [],
-  "desiredStartHour": 0,
-  "desiredEndHour": 23,
-  "retryLimit": 10,
+  "desiredStartTime": "00:00",
+  "desiredEndTime": "23:30",
+  "retryLimit": 1,
+  "refreshInterval": 0.2,
   "twilioAcctSid": "",
   "twilioAuthToken": "",
   "twilioFromNumber": "",
-  "twilioToNumber": ""
+  "twilioToNumber": "",
+  "refreshToken": "",
+  "accessToken": ""
 }
