@@ -72,6 +72,7 @@ class FlexUnlimited:
         self.arrivalBuffer = config["arrivalBuffer"]  # arrival buffer in minutes
         self.desiredStartTime = config["desiredStartTime"]  # start time in military time
         self.desiredEndTime = config["desiredEndTime"]  # end time in military time
+        self.desiredWeekdays = set()
         self.retryLimit = config["retryLimit"]  # number of jobs retrieval requests to perform
         self.refreshInterval = config["refreshInterval"]  # sets delay in between getOffers requests
         self.twilioFromNumber = config["twilioFromNumber"]
@@ -83,6 +84,8 @@ class FlexUnlimited:
         self.refreshToken = config["refreshToken"]
         self.accessToken = config["accessToken"]
         self.session = requests.Session()
+        
+        desiredWeekdays = config["desiredWeekdays"]
 
         twilioAcctSid = config["twilioAcctSid"]
         twilioAuthToken = config["twilioAuthToken"]
@@ -98,6 +101,19 @@ class FlexUnlimited:
       self.twilioClient = Client(twilioAcctSid, twilioAuthToken)
     else:
       self.twilioClient = None
+      
+    weekdayMap = {"mon": 0, "tue": 1, "wed": 2, "thu": 3, "fri": 4, "sat": 5, "sun": 6}
+    if len(desiredWeekdays) == 0:
+      self.desiredWeekdays = None
+    else:
+      for day in desiredWeekdays:
+        dayAbbreviated = day[:3].lower()
+        if dayAbbreviated not in weekdayMap:
+          print("Weekday '" + day + "' is misspelled. Please correct config.json file and restart program.")
+          exit()
+        self.desiredWeekdays.add(weekdayMap[dayAbbreviated])
+      if len(self.desiredWeekdays) == 7:
+        self.desiredWeekdays = None
 
     if self.refreshToken == "":
       self.__registerAccount()
@@ -392,6 +408,10 @@ class FlexUnlimited:
   def __processOffer(self, offer: Offer):
     if offer.hidden:
       return
+      
+    if self.desiredWeekdays:
+      if offer.weekday not in self.desiredWeekdays:
+        return
 
     if self.minBlockRate:
       if offer.blockRate < self.minBlockRate:
