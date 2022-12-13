@@ -13,6 +13,7 @@ class Offer:
         self.endTime = datetime.fromtimestamp(offerResponseObject.get('endTime'))
         self.hidden = offerResponseObject.get("hidden")
         self.ratePerHour = self.blockRate / ((self.endTime - self.expirationDate).seconds / 3600)
+        self.weekday = self.expirationDate.weekday()
     
     def toString(self) -> str:
         blockDuration = (self.endTime - self.expirationDate).seconds / 3600
