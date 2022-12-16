@@ -55,6 +55,7 @@ class FlexUnlimited:
     "GetOffers": "https://flex-capacity-na.amazon.com/GetOffersForProviderPost",
     "AcceptOffer": "https://flex-capacity-na.amazon.com/AcceptOffer",
     "GetAuthToken": "https://api.amazon.com/auth/register",
+    "RequestNewAccessToken": "https://api.amazon.com/auth/token",
     "ForfeitOffer": "https://flex-capacity-na.amazon.com/schedule/blocks/",
     "GetEligibleServiceAreas": "https://flex-capacity-na.amazon.com/eligibleServiceAreas",
     "GetOfferFiltersOptions": "https://flex-capacity-na.amazon.com/getOfferFiltersOptions"
@@ -102,6 +103,24 @@ class FlexUnlimited:
     else:
       self.twilioClient = None
       
+    self.__setDesiredWeekdays(desiredWeekdays)
+
+    if self.refreshToken == "":
+      self.__registerAccount()
+
+    self.__requestHeaders["x-amz-access-token"] = self.accessToken
+    self.__requestHeaders["X-Amz-Date"] = FlexUnlimited.__getAmzDate()
+    self.serviceAreaIds = self.__getEligibleServiceAreas()
+    self.__offersRequestBody = {
+      "apiVersion": "V2",
+      "filters": {
+        "serviceAreaFilter": self.desiredWarehouses,
+        "timeFilter": {"endTime": self.desiredEndTime, "startTime": self.desiredStartTime}
+      },
+      "serviceAreaIds": self.serviceAreaIds
+    }
+    
+  def __setDesiredWeekdays(self, desiredWeekdays):
     weekdayMap = {"mon": 0, "tue": 1, "wed": 2, "thu": 3, "fri": 4, "sat": 5, "sun": 6}
     if len(desiredWeekdays) == 0:
       self.desiredWeekdays = None
@@ -114,20 +133,6 @@ class FlexUnlimited:
         self.desiredWeekdays.add(weekdayMap[dayAbbreviated])
       if len(self.desiredWeekdays) == 7:
         self.desiredWeekdays = None
-
-    if self.refreshToken == "":
-      self.__registerAccount()
-
-    self.__requestHeaders["x-amz-access-token"] = self.accessToken
-    self.__requestHeaders["X-Amz-Date"] = FlexUnlimited.__getAmzDate()
-    self.serviceAreaIds = self.__getEligibleServiceAreas()
-    self.__offersRequestBody = {
-      "apiVersion": "V2",
-      "filters": {"serviceAreaFilter": self.desiredWarehouses,
-                  "timeFilter": {"endTime": self.desiredEndTime, "startTime": self.desiredStartTime}
-                  },
-      "serviceAreaIds": self.serviceAreaIds
-    }
 
   def __registerAccount(self):
     link = "https://www.amazon.com/ap/signin?ie=UTF8&clientContext=134-9172090-0857541&openid.pape.max_auth_age=0&use_global_authentication=false&accountStatusPolicy=P1&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&use_audio_captcha=false&language=en_US&pageId=amzn_device_na&arb=97b4a0fe-13b8-45fd-b405-ae94b0fec45b&openid.return_to=https%3A%2F%2Fwww.amazon.com%2Fap%2Fmaplanding&openid.assoc_handle=amzn_device_na&openid.oa2.response_type=token&openid.mode=checkid_setup&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.ns.oa2=http%3A%2F%2Fwww.amazon.com%2Fap%2Fext%2Foauth%2F2&openid.oa2.scope=device_auth_access&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&disableLoginPrepopulate=0&openid.oa2.client_id=device%3A32663430323338643639356262653236326265346136356131376439616135392341314d50534c4643374c3541464b&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0"
@@ -180,15 +185,15 @@ class FlexUnlimited:
       }
     }
 
-    url = 'https://api.amazon.com/auth/register'
-    reg_headers = {"Content-Type": "application/json",
-                   "Accept-Charset": "utf-8",
-                   "x-amzn-identity-auth-domain": "api.amazon.com",
-                   "Connection": "keep-alive",
-                   "Accept": "*/*",
-                   "Accept-Language": "en-US"
-                   }
-    res = self.session.post(url, json=amazon_reg_data, headers=reg_headers, verify=True)
+    reg_headers = {
+      "Content-Type": "application/json",
+      "Accept-Charset": "utf-8",
+      "x-amzn-identity-auth-domain": "api.amazon.com",
+      "Connection": "keep-alive",
+      "Accept": "*/*",
+      "Accept-Language": "en-US"
+    }
+    res = self.session.post(FlexUnlimited.routes.get("GetAuthToken"), json=amazon_reg_data, headers=reg_headers, verify=True)
     if res.status_code != 200:
         print("login failed")
         exit(1)
@@ -241,7 +246,6 @@ class FlexUnlimited:
     return base64.b64encode(b"\0" + hmac_[:8] + iv + ciphertext).decode()
 
   def __getFlexAccessToken(self):
-    url = 'https://api.amazon.com/auth/token'
     data = {
       "app_name": APP_NAME,
       "app_version": APP_VERSION,
@@ -253,7 +257,7 @@ class FlexUnlimited:
       "User-Agent": "Dalvik/2.1.0 (Linux; U; Android 10; Pixel 2 Build/OPM1.171019.021)",
       "x-amzn-identity-auth-domain": "api.amazon.com",
     }
-    res = self.session.post(url, json=data, headers=headers).json()
+    res = self.session.post(FlexUnlimited.routes.get("RequestNewAccessToken"), json=data, headers=headers).json()
     self.accessToken = res['access_token']
     try:
       with open("config.json", "r+") as configFile:
