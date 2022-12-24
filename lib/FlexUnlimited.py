@@ -79,6 +79,7 @@ class FlexUnlimited:
         self.twilioFromNumber = config["twilioFromNumber"]
         self.twilioToNumber = config["twilioToNumber"]
         self.__retryCount = 0
+        self.__rate_limit_number = 1
         self.__acceptedOffers = []
         self.__startTimestamp = time.time()
         self.__requestHeaders = FlexUnlimited.allHeaders.get("FlexCapacityRequest")
@@ -447,6 +448,11 @@ class FlexUnlimited:
           offerResponseObject = Offer(offerResponseObject=offer)
           self.__processOffer(offerResponseObject)
         self.__retryCount += 1
+      elif offersResponse.status_code == 400:
+        minutes_to_wait = 30 * self.__rate_limit_number
+        Log.info("Rate limit reached. Waiting for " + str(minutes_to_wait) + " minutes.")
+        time.sleep(minutes_to_wait * 60)
+        self.__rate_limit_number += 1
       else:
         Log.error(offersResponse.json())
         break
