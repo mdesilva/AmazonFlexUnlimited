@@ -454,6 +454,8 @@ class FlexUnlimited:
         time.sleep(minutes_to_wait * 60)
         if self.__rate_limit_number < 4:
           self.__rate_limit_number += 1
+        else:
+          self.__rate_limit_number = 1
         Log.info("Resuming search.")
       else:
         Log.error(offersResponse.json())
