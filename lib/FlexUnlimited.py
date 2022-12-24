@@ -452,7 +452,8 @@ class FlexUnlimited:
         minutes_to_wait = 30 * self.__rate_limit_number
         Log.info("Rate limit reached. Waiting for " + str(minutes_to_wait) + " minutes.")
         time.sleep(minutes_to_wait * 60)
-        self.__rate_limit_number += 1
+        if self.__rate_limit_number < 4:
+          self.__rate_limit_number += 1
       else:
         Log.error(offersResponse.json())
         break
