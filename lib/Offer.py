@@ -11,7 +11,9 @@ class Offer:
         self.location = offerResponseObject.get('serviceAreaId')
         self.blockRate = float(offerResponseObject.get('rateInfo').get('priceAmount'))
         self.endTime = datetime.fromtimestamp(offerResponseObject.get('endTime'))
-
+        self.hidden = offerResponseObject.get("hidden")
+        self.ratePerHour = self.blockRate / ((self.endTime - self.expirationDate).seconds / 3600)
+        self.weekday = self.expirationDate.weekday()
     
     def toString(self) -> str:
         blockDuration = (self.endTime - self.expirationDate).seconds / 3600
@@ -19,6 +21,7 @@ class Offer:
         body = 'Location: ' + self.location + '\n'
         body += 'Date: ' + str(self.expirationDate.month) + '/' + str(self.expirationDate.day) + '\n'
         body += 'Pay: ' + str(self.blockRate) + '\n'
+        body += 'Pay rate per hour: ' + str(self.ratePerHour) + '\n'
         body += 'Block Duration: ' + str(blockDuration) + f'{"hour" if blockDuration == 1 else "hours"}\n'
 
         if not self.expirationDate.minute:
