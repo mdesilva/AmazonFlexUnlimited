@@ -14,7 +14,7 @@ This is an attempt to automate picking up Amazon Flex driver jobs. I attempted t
 0. You MUST have python 3 installed. Versions below 3 will not work.  
 1. Clone the repo to the machine you will be using to run the program (machine should be connected to Internet by wire for best results).
 2. Install dependencies using **pip**: `pip install -r requirements.txt`.
-3. Set `username` and `password` in **config.json**.
+3. Set `username`(Your Amazon Flex account username) and `password`(Your Amazon Flex account password) in **config.json**.
 4. Modify the remainder of **config.json** to meet your job search requirements. It already comes with some defaults. Fill out `desiredWarehouses` if you would like to restrict your job search to certain warehouses. If you choose this option, 
 `desiredWarehouses` must be a list of strings of **internal warehouse ids**. Otherwise, leave `desiredWarehouses` as an empty list.
 5. Fill out the `desiredWeekdays` filter in **config.json** if you would like to restrict your job search to certain days of the week. Otherwise, you may leave `desiredWeekdays` as an empty list. `desiredWeekdays` must be a list of strings (case insensitive) corresponding to days of the week (i.e. "Sun", "monday", etc.). Each string must include at least the first three letters of the day.
