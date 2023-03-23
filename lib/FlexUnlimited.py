@@ -36,7 +36,7 @@ class FlexUnlimited:
       "x-flex-instance-id": "BEEBE19A-FF23-47C5-B1D2-21507C831580",
       "Accept-Language": "en-US",
       "Content-Type": "application/json",
-      "User-Agent": "iOS/15.2 (iPhone Darwin) Model/iPhone Platform/iPhone13,3 RabbitiOS/2.88.2",
+      "User-Agent": "iOS/16.1 (iPhone Darwin) Model/iPhone Platform/iPhone14,2 RabbitiOS/2.112.2",
       "Connection": "keep-alive",
       "Cookie": 'session-id=147-7403990-6925948; session-id-time=2082787201l; '
                 'session-token=1mGSyTQU1jEQgpSB8uEn6FFHZ1iBcFpe9V7LTPGa3GV3sWf4bgscBoRKGmZb3TQICu7PSK5q23y3o4zYYhP'
