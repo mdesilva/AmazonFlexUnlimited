@@ -1,8 +1,10 @@
 import sys
 from lib.FlexUnlimited import FlexUnlimited
+from lib.Config import Config
 
 if __name__ == "__main__":
   print("***Amazon Flex Unlimited v2*** \n")
+  config = Config()
   flexUnlimited = FlexUnlimited()
   if (len(sys.argv) > 1):
     arg1 = sys.argv[1]
@@ -12,4 +14,5 @@ if __name__ == "__main__":
     else:
       print("Invalid argument provided.")
   else:
+    config.setTimeRange()
     flexUnlimited.run()
