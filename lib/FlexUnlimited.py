@@ -427,7 +427,7 @@ class FlexUnlimited:
         return
 
     if self.arrivalBuffer:
-      deltaTime = (offer.expirationDate - datetime.now()).seconds / 60
+      deltaTime = (offer.startTime - datetime.now()).seconds / 60
       if deltaTime < self.arrivalBuffer:
         return
 
