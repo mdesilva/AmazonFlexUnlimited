@@ -10,7 +10,12 @@ import pyaes
 from pbkdf2 import PBKDF2
 
 try:
-  from twilio.rest import Client
+  from pushover import Client as pClient, Message as pMessage
+except:
+  pass
+
+try:
+  from twilio.rest import Client as tClient
 except:
   pass
 
@@ -52,13 +57,13 @@ class FlexUnlimited:
     }
   }
   routes = {
-    "GetOffers": "https://flex-capacity-na.amazon.com/GetOffersForProviderPost",
-    "AcceptOffer": "https://flex-capacity-na.amazon.com/AcceptOffer",
+    "GetOffers": "https://flex-capacity-eu.amazon.com/GetOffersForProviderPost",
+    "AcceptOffer": "https://flex-capacity-eu.amazon.com/AcceptOffer",
     "GetAuthToken": "https://api.amazon.com/auth/register",
     "RequestNewAccessToken": "https://api.amazon.com/auth/token",
-    "ForfeitOffer": "https://flex-capacity-na.amazon.com/schedule/blocks/",
-    "GetEligibleServiceAreas": "https://flex-capacity-na.amazon.com/eligibleServiceAreas",
-    "GetOfferFiltersOptions": "https://flex-capacity-na.amazon.com/getOfferFiltersOptions"
+    "ForfeitOffer": "https://flex-capacity-eu.amazon.com/schedule/blocks/",
+    "GetEligibleServiceAreas": "https://flex-capacity-eu.amazon.com/eligibleServiceAreas",
+    "GetOfferFiltersOptions": "https://flex-capacity-eu.amazon.com/getOfferFiltersOptions"
   }
 
   def __init__(self) -> None:
@@ -89,6 +94,9 @@ class FlexUnlimited:
         
         desiredWeekdays = config["desiredWeekdays"]
 
+        pushoverUserKey = config["pushoverUserKey"]
+        pushoverApiKey = config["pushoverApiKey"]
+
         twilioAcctSid = config["twilioAcctSid"]
         twilioAuthToken = config["twilioAuthToken"]
 
@@ -98,6 +106,11 @@ class FlexUnlimited:
     except FileNotFoundError:
       Log.error("Config file not found. Ensure a properly formatted 'config.json' file exists in the root directory.")
       sys.exit()
+
+    if pushoverUserKey != "" and pushoverApiKey != "":
+      self.pushoverClient = pClient(pushoverUserKey, pushoverApiKey)
+    else:
+      self.pushoverClient = None
 
     if twilioAcctSid != "" and twilioAuthToken != "" and self.twilioFromNumber != "" and self.twilioToNumber != "":
       self.twilioClient = Client(twilioAcctSid, twilioAuthToken)
@@ -401,11 +414,20 @@ class FlexUnlimited:
 
     if request.status_code == 200:
       self.__acceptedOffers.append(offer)
+
+      if self.pushoverClient is not None:
+        self.pushoverMessage = pMessage(
+          offer.toString(),
+          title="New Block Claimed!",
+          sound="climb")
+        self.pushoverClient.send(self.pushoverMessage)
+
       if self.twilioClient is not None:
         self.twilioClient.messages.create(
           to=self.twilioToNumber,
           from_=self.twilioFromNumber,
           body=offer.toString())
+        
       Log.info(f"Successfully accepted an offer.")
     else:
       Log.error(f"Unable to accept an offer. Request returned status code {request.status_code}")
