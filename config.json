@@ -10,6 +10,8 @@
   "desiredWeekdays": ["MON", "tue", "Wed", "Thur", "Fri", "Sat", "Sunday"],
   "retryLimit": 10,
   "refreshInterval": 0.2,
+  "pushoverUserKey": "",
+  "pushoverApiKey": "ak4sd27iw28fazeoynabbikm93ju48",
   "twilioAcctSid": "",
   "twilioAuthToken": "",
   "twilioFromNumber": "",
