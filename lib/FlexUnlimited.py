@@ -57,13 +57,13 @@ class FlexUnlimited:
     }
   }
   routes = {
-    "GetOffers": "https://flex-capacity-eu.amazon.com/GetOffersForProviderPost",
-    "AcceptOffer": "https://flex-capacity-eu.amazon.com/AcceptOffer",
+    "GetOffers": "https://flex-capacity-na.amazon.com/GetOffersForProviderPost",
+    "AcceptOffer": "https://flex-capacity-na.amazon.com/AcceptOffer",
     "GetAuthToken": "https://api.amazon.com/auth/register",
     "RequestNewAccessToken": "https://api.amazon.com/auth/token",
-    "ForfeitOffer": "https://flex-capacity-eu.amazon.com/schedule/blocks/",
-    "GetEligibleServiceAreas": "https://flex-capacity-eu.amazon.com/eligibleServiceAreas",
-    "GetOfferFiltersOptions": "https://flex-capacity-eu.amazon.com/getOfferFiltersOptions"
+    "ForfeitOffer": "https://flex-capacity-na.amazon.com/schedule/blocks/",
+    "GetEligibleServiceAreas": "https://flex-capacity-na.amazon.com/eligibleServiceAreas",
+    "GetOfferFiltersOptions": "https://flex-capacity-na.amazon.com/getOfferFiltersOptions"
   }
 
   def __init__(self) -> None:
