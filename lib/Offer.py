@@ -18,7 +18,7 @@ class Offer:
     def __srt__(self) -> str:
         blockDuration = (self.endTime - self.startTime).seconds / SECONDS_IN_HOUR
 
-        body = (
+        return (
             f'Location:       {self.location}\n'
             f'Date:           {self.startTime.strftime("%m/%d")}\n'
             f'Total Pay:      {self.blockRate}\n'
@@ -27,5 +27,3 @@ class Offer:
             f'Start Time:     {self.startTime.strftime("%H:%M")}\n'
             f'End Time:       {self.endTime.strftime("%H:%M")}\n'
         )
-
-        return body
