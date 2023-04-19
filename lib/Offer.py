@@ -13,7 +13,7 @@ class Offer:
         self.ratePerHour    = self.blockRate / ((self.endTime - self.startTime).seconds / 3600)
         self.weekday        = self.expirationDate.weekday()
     
-    def toString(self) -> str:
+    def __srt__(self) -> str:
         blockDuration = (self.endTime - self.startTime).seconds / 3600
 
         body = 'Location: ' + self.location + '\n'

@@ -405,7 +405,8 @@ class FlexUnlimited:
         self.twilioClient.messages.create(
           to=self.twilioToNumber,
           from_=self.twilioFromNumber,
-          body=offer.toString())
+          body=str(offer)
+        )
       Log.info(f"Successfully accepted an offer.")
     else:
       Log.error(f"Unable to accept an offer. Request returned status code {request.status_code}")
