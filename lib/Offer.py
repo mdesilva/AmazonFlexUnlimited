@@ -22,15 +22,9 @@ class Offer:
             f'Total Pay:      {self.blockRate}\n'
             f'Hourly Rate:    {self.ratePerHour}\n'
             f'Block Duration: {blockDuration} hour(s)\n'
+            f'Start Time:     {self.startTime.strftime("%H:%M")}'
         )
-
-        if not self.startTime.minute:
-            body += 'Start time: ' + str(self.startTime.hour) + '00\n'
-        elif self.startTime.minute < 10:
-            body += 'Start time: ' + str(self.startTime.hour) + '0' + str(self.startTime.minute) + '\n'
-        else:
-            body += 'Start time: ' + str(self.startTime.hour) + str(self.startTime.minute) + '\n'
-
+        
         if not self.endTime.minute:
             body += 'End time: ' + str(self.endTime.hour) + '00\n'
         elif self.endTime.minute < 10:
