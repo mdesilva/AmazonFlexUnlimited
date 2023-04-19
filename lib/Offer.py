@@ -16,11 +16,13 @@ class Offer:
     def __srt__(self) -> str:
         blockDuration = (self.endTime - self.startTime).seconds / 3600
 
-        body = 'Location: ' + self.location + '\n'
-        body += 'Date: ' + str(self.startTime.month) + '/' + str(self.startTime.day) + '\n'
-        body += 'Pay: ' + str(self.blockRate) + '\n'
-        body += 'Pay rate per hour: ' + str(self.ratePerHour) + '\n'
-        body += 'Block Duration: ' + str(blockDuration) + f'{"hour" if blockDuration == 1 else "hours"}\n'
+        body = (
+            f'Location:       {self.location}\n'
+            f'Date:           {str(self.startTime.month)}/{str(self.startTime.day)}\n'
+            f'Total Pay:      {self.blockRate}\n'
+            f'Hourly Rate:    {self.ratePerHour}\n'
+            f'Block Duration: {blockDuration} hour(s)\n'
+        )
 
         if not self.startTime.minute:
             body += 'Start time: ' + str(self.startTime.hour) + '00\n'
