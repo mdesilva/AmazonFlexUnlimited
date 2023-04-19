@@ -15,7 +15,7 @@ class Offer:
         self.ratePerHour    = self.blockRate / ((self.endTime - self.startTime).seconds / SECONDS_IN_HOUR)
         self.weekday        = self.expirationDate.weekday()
     
-    def __srt__(self) -> str:
+    def __str__(self) -> str:
         blockDuration = (self.endTime - self.startTime).seconds / SECONDS_IN_HOUR
 
         return (
