@@ -5,14 +5,14 @@ from lib.Log import Log
 
 class Offer:
 
-    def __init__(self, offerResponseObject: object) -> None:
-        self.id = offerResponseObject.get("offerId")
-        self.expirationDate = datetime.fromtimestamp(offerResponseObject.get("expirationDate"))
-        self.startTime = datetime.fromtimestamp(offerResponseObject.get("startTime"))
-        self.location = offerResponseObject.get('serviceAreaId')
-        self.blockRate = float(offerResponseObject.get('rateInfo').get('priceAmount'))
-        self.endTime = datetime.fromtimestamp(offerResponseObject.get('endTime'))
-        self.hidden = offerResponseObject.get("hidden")
+    def __init__(self, offer_information: object) -> None:
+        self.id = offer_information.get("offerId")
+        self.expirationDate = datetime.fromtimestamp(offer_information.get("expirationDate"))
+        self.startTime = datetime.fromtimestamp(offer_information.get("startTime"))
+        self.location = offer_information.get('serviceAreaId')
+        self.blockRate = float(offer_information.get('rateInfo').get('priceAmount'))
+        self.endTime = datetime.fromtimestamp(offer_information.get('endTime'))
+        self.hidden = offer_information.get("hidden")
         self.ratePerHour = self.blockRate / ((self.endTime - self.startTime).seconds / 3600)
         self.weekday = self.expirationDate.weekday()
     
