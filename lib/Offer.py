@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from constants import SECONDS_IN_HOUR
+
 
 class Offer:
     def __init__(self, offer_information: object) -> None:
@@ -14,7 +16,7 @@ class Offer:
         self.weekday        = self.expirationDate.weekday()
     
     def __srt__(self) -> str:
-        blockDuration = (self.endTime - self.startTime).seconds / 3600
+        blockDuration = (self.endTime - self.startTime).seconds / SECONDS_IN_HOUR
 
         body = (
             f'Location:       {self.location}\n'
