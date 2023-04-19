@@ -18,7 +18,7 @@ class Offer:
 
         body = (
             f'Location:       {self.location}\n'
-            f'Date:           {str(self.startTime.month)}/{str(self.startTime.day)}\n'
+            f'Date:           {self.startTime.strftime("%m/%d")}\n'
             f'Total Pay:      {self.blockRate}\n'
             f'Hourly Rate:    {self.ratePerHour}\n'
             f'Block Duration: {blockDuration} hour(s)\n'
