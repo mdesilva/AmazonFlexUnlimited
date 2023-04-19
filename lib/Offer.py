@@ -12,7 +12,7 @@ class Offer:
         self.blockRate      = float(offer_information.get('rateInfo').get('priceAmount'))
         self.endTime        = datetime.fromtimestamp(offer_information.get('endTime'))
         self.hidden         = offer_information.get("hidden")
-        self.ratePerHour    = self.blockRate / ((self.endTime - self.startTime).seconds / 3600)
+        self.ratePerHour    = self.blockRate / ((self.endTime - self.startTime).seconds / SECONDS_IN_HOUR)
         self.weekday        = self.expirationDate.weekday()
     
     def __srt__(self) -> str:
