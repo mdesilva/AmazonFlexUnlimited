@@ -1,7 +1,5 @@
 from datetime import datetime
 
-from lib.Log import Log
-
 
 class Offer:
     def __init__(self, offer_information: object) -> None:
