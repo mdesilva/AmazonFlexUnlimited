@@ -22,8 +22,8 @@ class Offer:
             f'Location:       {self.location}\n'
             f'Date:           {self.startTime.strftime("%m/%d")}\n'
             f'Total Pay:      {self.blockRate}\n'
-            f'Hourly Rate:    {self.ratePerHour}\n'
-            f'Block Duration: {blockDuration} hour(s)\n'
+            f'Hourly Rate:    {self.ratePerHour:0.2f}\n'
+            f'Block Duration: {blockDuration:0.2f} hour(s)\n'
             f'Start Time:     {self.startTime.strftime("%H:%M")}\n'
             f'End Time:       {self.endTime.strftime("%H:%M")}\n'
         )
