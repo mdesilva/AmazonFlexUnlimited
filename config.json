@@ -15,5 +15,6 @@
   "twilioFromNumber": "",
   "twilioToNumber": "",
   "refreshToken": "",
-  "accessToken": ""
+  "accessToken": "",
+	"ntfyChannel": ""
 }

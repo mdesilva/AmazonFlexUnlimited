@@ -91,6 +91,7 @@ class FlexUnlimited:
 
         twilioAcctSid = config["twilioAcctSid"]
         twilioAuthToken = config["twilioAuthToken"]
+        self.ntfyChannel = config['ntfyChannel']
 
     except KeyError as nullKey:
       Log.error(f'{nullKey} was not set. Please setup FlexUnlimited as described in the README.')
@@ -406,6 +407,7 @@ class FlexUnlimited:
           to=self.twilioToNumber,
           from_=self.twilioFromNumber,
           body=offer.toString())
+      requests.post("https://ntfy.sh/" + self.ntfyChannel, data="Succesfully accepted an offer.".encode(encoding='utf-8'))
       Log.info(f"Successfully accepted an offer.")
     else:
       Log.error(f"Unable to accept an offer. Request returned status code {request.status_code}")
