@@ -407,7 +407,8 @@ class FlexUnlimited:
           to=self.twilioToNumber,
           from_=self.twilioFromNumber,
           body=offer.toString())
-      requests.post("https://ntfy.sh/" + self.ntfyChannel, data="Succesfully accepted an offer.".encode(encoding='utf-8'))
+      if self.ntfyChannel != "":
+          requests.post("https://ntfy.sh/" + self.ntfyChannel, data="Succesfully accepted an Amazon Flex block.".encode(encoding='utf-8'))
       Log.info(f"Successfully accepted an offer.")
     else:
       Log.error(f"Unable to accept an offer. Request returned status code {request.status_code}")
