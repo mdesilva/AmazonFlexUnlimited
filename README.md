@@ -35,6 +35,9 @@ e.g
 5. Optionally, setup SMS notifications of Amazon Flex job acceptances by filling out the `twilio` parameters in  **config.json**.
 6. Run `python app.py`. Alternatively, try `python3 app.py`.
 
+## ntfy.sh-support
+Add your ntfy.sh channel to the config.json.
+
 ## Troubleshooting ##
 
 - Unable to authenticate to Amazon Flex. Please try completing the two step verification challenge at (url)
