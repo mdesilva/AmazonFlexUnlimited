@@ -102,6 +102,7 @@ class FlexUnlimited:
         twilioAuthToken = config["twilioAuthToken"]
         self.ntfyChannel = config['ntfyChannel']
         self.minimalConsoleOutput = config['minimalConsoleOutput']
+        self.filterForWarehouse = config['filterForWarehouse']
 
     except KeyError as nullKey:
       Log.error(f'{nullKey} was not set. Please setup FlexUnlimited as described in the README.')
@@ -123,14 +124,23 @@ class FlexUnlimited:
     self.__requestHeaders["x-amz-access-token"] = self.accessToken
     self.__requestHeaders["X-Amz-Date"] = FlexUnlimited.__getAmzDate()
     self.serviceAreaIds = self.__getEligibleServiceAreas()
-    self.__offersRequestBody = {
-      "apiVersion": "V2",
-      "filters": {
-        "serviceAreaFilter": self.desiredWarehouses,
-        "timeFilter": {"endTime": self.desiredEndTime, "startTime": self.desiredStartTime}
-      },
-      "serviceAreaIds": self.serviceAreaIds
-    }
+    if self.filterForWarehouse:
+        self.__offersRequestBody = {
+                "apiVersion": "V2",
+                "filters": {
+                    "serviceAreaFilter": self.desiredWarehouses,
+                    "timeFilter": {"endTime": self.desiredEndTime, "startTime": self.desiredStartTime}
+                    },
+                "serviceAreaIds": self.serviceAreaIds
+                }
+    else:
+        self.__offersRequestBody = {
+                "apiVersion": "V2",
+                "filters": {
+                    "timeFilter": {"endTime": self.desiredEndTime, "startTime": self.desiredStartTime}
+                    },
+                "serviceAreaIds": self.serviceAreaIds
+                }
     
   def __setDesiredWeekdays(self, desiredWeekdays):
     weekdayMap = {"mon": 0, "tue": 1, "wed": 2, "thu": 3, "fri": 4, "sat": 5, "sun": 6}
@@ -420,6 +430,11 @@ class FlexUnlimited:
       if self.ntfyChannel != "":
           Log.ntfy("Succesfully accepted an offer.", self.ntfyChannel)
       Log.success(f"Successfully accepted an offer.")
+    elif offersResponse.status_code == 307:
+        Log.error("Please open Amazon Flex app, accept offer, and complete captcha to proceed.")
+        if self.ntfyChannel != "":
+            Log.ntfy("Please open Amazon Flex app, accept offer, and complete captcha to proceed.", self.ntfyChannel)
+        exit()
     else:
       Log.error(f"Unable to accept an offer. Request returned status code {request.status_code}")
 
@@ -443,6 +458,11 @@ class FlexUnlimited:
       deltaTime = (offer.startTime - datetime.now()).seconds / 60
       if deltaTime < self.arrivalBuffer:
         return
+
+    if not self.filterForWarehouse:
+      if len(self.desiredWarehouses) > 0:
+        if offer.location not in self.desiredWarehouses:
+          return
 
     self.__acceptOffer(offer)
 
