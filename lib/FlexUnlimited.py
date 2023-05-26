@@ -101,6 +101,7 @@ class FlexUnlimited:
         twilioAcctSid = config["twilioAcctSid"]
         twilioAuthToken = config["twilioAuthToken"]
         self.ntfyChannel = config['ntfyChannel']
+        self.minimalConsoleOutput = config['minimalConsoleOutput']
 
     except KeyError as nullKey:
       Log.error(f'{nullKey} was not set. Please setup FlexUnlimited as described in the README.')
@@ -484,7 +485,8 @@ class FlexUnlimited:
         Log.error(offersResponse.json())
         break
       sleeptime = random.uniform(self.refreshIntervalMin, self.refreshIntervalMax)
-      Log.info("Found 0 new offer(s), sleeping " + str(round(sleeptime, 2)) + "s.")
+      if not self.minimalConsoleOutput:
+        Log.info("Found 0 new offer(s), sleeping " + str(round(sleeptime, 2)) + "s.")
       time.sleep(sleeptime)
     Log.info("Block search stopped.")
     Log.info(f"Accepted {len(self.__acceptedOffers)} offers in {time.time() - self.__startTimestamp} seconds")

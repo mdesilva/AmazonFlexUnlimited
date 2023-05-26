@@ -1,4 +1,5 @@
 # Amazon Flex Unlimited SUPERCHARGED
+<<<<<<< HEAD
 This work is based on the work done by @mdesilva.
 The original Amazon Flex Unlimited repository can be found at [https://github.com/mdesilva/AmazonFlexUnlimited](https://github.com/mdesilva/AmazonFlexUnlimited).
 
@@ -12,22 +13,50 @@ Set "ntfyChannel" in config.json to your ntft.sh-channel, and your notifications
 ## Run infinitely
 Set "retryLimit" to 0 in config.json to make the script run infinitely.
 It only exits if it encounters a CAPTCHA.
+=======
+This work is based on the work done by @mdesilva. The original Amazon Flex Unlimited repository can be found at [https://github.com/mdesilva/AmazonFlexUnlimited](https://github.com/mdesilva/AmazonFlexUnlimited).
+
+SUPERCHARGED currently adds the following functionality to the script:
+
+## Detect CAPTCHA
+Starting 2023, Amazon now asks suspected bot-users to confirm that they are human through completing a CAPTCHA in the Flex app. If the script encounters this, it will send you an ntfy notification and exit the script entirely.
+
+## ntfy.sh Notifications
+Through the free Android and iOS-app ntfy, the script now provides push notifications when a block has been accepted, as well as when a CAPTCHA is encountered.
+
+Set "ntfyChannel" in config.json to your ntfy.sh-channel, and your notifications will be delivered there.
+
+## Run infinitely
+Set "retryLimit" to 0 in config.json to make the script run infinitely. It only exits if it encounters a CAPTCHA.
+>>>>>>> 836a89f4016f8d16bd84cf1f2f107a799b7c45a1
 
 ## Randomized refresh interval
 "refreshInterval" in config.js has been split into two:
 
+<<<<<<< HEAD
 1.
 "refreshIntervalMin"
 2.
 "refreshIntervalMax"
+=======
+1. "refreshIntervalMin"
+2. "refreshIntervalMax"
+>>>>>>> 836a89f4016f8d16bd84cf1f2f107a799b7c45a1
 
 These are both floats, and the sleep-time between two attempts is found by selecting a random number between the min and max values.
 
 ## More console output
+<<<<<<< HEAD
 Every attempt, including its sleep-time, is not printed in the console.
 Disable this by setting "minimalConsoleOutput" to true.
 
 
+=======
+Every attempt, including its sleep-time, is now printed in the console. Disable this by setting "minimalConsoleOutput" to true.
+
+# Original README.md
+This is the original README.md from @mdesilva.
+>>>>>>> 836a89f4016f8d16bd84cf1f2f107a799b7c45a1
 
 ## Automate searching and accepting Amazon Flex Driver jobs
 
