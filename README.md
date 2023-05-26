@@ -1,4 +1,4 @@
-# Flex Unlimited Supercharged #
+# Flex Unlimited SUPERCHARGED #
 ## Automate searching and accepting Amazon Flex Driver jobs ##
 
 This is an attempt to automate picking up Amazon Flex driver jobs.
