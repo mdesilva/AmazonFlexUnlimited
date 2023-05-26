@@ -410,8 +410,8 @@ class FlexUnlimited:
           from_=self.twilioFromNumber,
           body=offer.toString())
       if self.ntfyChannel != "":
-          requests.post("https://ntfy.sh/" + self.ntfyChannel, data="Succesfully accepted an Amazon Flex block.".encode(encoding='utf-8'))
-      Log.info(f"Successfully accepted an offer.")
+          Log.ntfy("Succesfully accepted an offer.", self.ntfyChannel)
+      Log.success(f"Successfully accepted an offer.")
     else:
       Log.error(f"Unable to accept an offer. Request returned status code {request.status_code}")
 
@@ -468,6 +468,11 @@ class FlexUnlimited:
         else:
           self.__rate_limit_number = 1
         Log.info("Resuming search.")
+      elif offersResponse.status_code == 307:
+          Log.error("Please open Amazon Flex app, accept offer, and complete captcha to proceed.")
+          if self.ntfyChannel != "":
+              Log.ntfy("Please open Amazon Flex app, accept offer, and complete captcha to proceed.", self.ntfyChannel)
+          exit()
       else:
         Log.error(offersResponse.json())
         break
