@@ -17,5 +17,6 @@
   "twilioToNumber": "",
   "refreshToken": "",
   "accessToken": "",
-  "ntfyChannel": ""
+  "ntfyChannel": "",
+	"minimalConsoleOutput": false
 }

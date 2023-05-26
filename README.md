@@ -1,5 +1,35 @@
-# Flex Unlimited SUPERCHARGED #
-## Automate searching and accepting Amazon Flex Driver jobs ##
+# Amazon Flex Unlimited SUPERCHARGED
+This work is based on the work done by @mdesilva.
+The original Amazon Flex Unlimited repository can be found at [https://github.com/mdesilva/AmazonFlexUnlimited](https://github.com/mdesilva/AmazonFlexUnlimited).
+
+SUPERCHARGED currently adds the following functionality to the script:
+
+## ntfy.sh Notifications
+Through the free Android and iOS-app ntfy, the script now provides push notifications when a block has been accepted, as well as when a CAPTCHA is encountered.
+
+Set "ntfyChannel" in config.json to your ntft.sh-channel, and your notifications will be delivered there.
+
+## Run infinitely
+Set "retryLimit" to 0 in config.json to make the script run infinitely.
+It only exits if it encounters a CAPTCHA.
+
+## Randomized refresh interval
+"refreshInterval" in config.js has been split into two:
+
+1.
+"refreshIntervalMin"
+2.
+"refreshIntervalMax"
+
+These are both floats, and the sleep-time between two attempts is found by selecting a random number between the min and max values.
+
+## More console output
+Every attempt, including its sleep-time, is not printed in the console.
+Disable this by setting "minimalConsoleOutput" to true.
+
+
+
+## Automate searching and accepting Amazon Flex Driver jobs
 
 This is an attempt to automate picking up Amazon Flex driver jobs.
 I attempted to automate this process for a client and it worked well.
