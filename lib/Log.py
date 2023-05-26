@@ -13,7 +13,7 @@ class Log:
 
     @staticmethod
     def error(message: str):
-        print(f'ERROR: {message}', flush=True)
+        print(f'['+str(datetime.now())+'] ERROR: {message}', flush=True)
 
     @staticmethod
     def ntfy(message: str, channel: str):

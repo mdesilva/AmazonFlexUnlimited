@@ -430,7 +430,7 @@ class FlexUnlimited:
       if self.ntfyChannel != "":
           Log.ntfy("Succesfully accepted an offer.", self.ntfyChannel)
       Log.success(f"Successfully accepted an offer.")
-    elif offersResponse.status_code == 307:
+    elif request.status_code == 307:
         Log.error("Please open Amazon Flex app, accept offer, and complete captcha to proceed.")
         if self.ntfyChannel != "":
             Log.ntfy("Please open Amazon Flex app, accept offer, and complete captcha to proceed.", self.ntfyChannel)
@@ -485,6 +485,9 @@ class FlexUnlimited:
                            reverse=True)
         for offer in currentOffers:
           offerResponseObject = Offer(offerResponseObject=offer)
+          if not self.minimalConsoleOutput:
+            Log.info("Listing found offer:")
+            Log.info(offerResponseObject.toString())
           self.__processOffer(offerResponseObject)
         self.__retryCount += 1
       elif offersResponse.status_code == 400:
