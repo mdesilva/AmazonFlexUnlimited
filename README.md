@@ -26,10 +26,10 @@ These are both floats, and the sleep-time between two attempts is found by selec
 ## More console output
 Every attempt, including its sleep-time, is now printed in the console. Disable this by setting "minimalConsoleOutput" to true.
 
-## Method to filter desired warehouses
-The way this script originally chose whether a certain offer should be considered was by sending the id's of the desired warehouses to the getOffer endpoint. Instead, it is possible to fetch all offers, but only accept the ones with the correct warehouse id. This change should have no impact on the functionality of the script.
+## Experimental: Method to filter desired warehouses
+The way this script originally chose whether a certain offer should be considered was by sending the id's of the desired warehouses to the getOffer endpoint. Instead, it is possible to fetch all offers, but only accept the ones with the correct warehouse id.
 
-Set "filterForWarehouse" to false to enable the new method.
+Set "filterForWarehouse" to false to enable the new method. It does not yet have any actual influence on the functionality of the script, but in the future it will be able to provide you with an overview of available and unaccepted offers encountered by the script during its run.
 
 # Original README.md
 This is the original README.md from @mdesilva.
