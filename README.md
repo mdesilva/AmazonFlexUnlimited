@@ -26,6 +26,11 @@ These are both floats, and the sleep-time between two attempts is found by selec
 ## More console output
 Every attempt, including its sleep-time, is now printed in the console. Disable this by setting "minimalConsoleOutput" to true.
 
+## Method to filter desired warehouses
+The way this script originally chose whether a certain offer should be considered was by sending the id's of the desired warehouses to the getOffer endpoint. Instead, it is possible to fetch all offers, but only accept the ones with the correct warehouse id. This change should have no impact on the functionality of the script.
+
+Set "filterForWarehouse" to false to enable the new method.
+
 # Original README.md
 This is the original README.md from @mdesilva.
 # Flex Unlimited #
