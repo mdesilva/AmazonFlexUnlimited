@@ -1,8 +1,10 @@
+from datetime import datetime
+
 class Log:
     
     @staticmethod 
     def info(message: str):
-        print(f'INFO: {message}', flush=True)
+        print(f'['+str(datetime.now())+'] INFO: '+message, flush=True)
 
     @staticmethod
     def error(message: str):

@@ -8,6 +8,7 @@ from urllib.parse import unquote, urlparse, parse_qs
 import base64, hashlib, hmac, gzip, secrets
 import pyaes
 from pbkdf2 import PBKDF2
+import random
 
 try:
   from twilio.rest import Client
@@ -75,7 +76,8 @@ class FlexUnlimited:
         self.desiredEndTime = config["desiredEndTime"]  # end time in military time
         self.desiredWeekdays = set()
         self.retryLimit = config["retryLimit"]  # number of jobs retrieval requests to perform
-        self.refreshInterval = config["refreshInterval"]  # sets delay in between getOffers requests
+        self.refreshIntervalMin = config["refreshIntervalMin"]  # sets delay in between getOffers requests
+        self.refreshIntervalMax = config["refreshIntervalMax"]  # sets delay in between getOffers requests
         self.twilioFromNumber = config["twilioFromNumber"]
         self.twilioToNumber = config["twilioToNumber"]
         self.__retryCount = 0
@@ -436,11 +438,17 @@ class FlexUnlimited:
 
     self.__acceptOffer(offer)
 
+  def whilecond(self):
+      if(self.retryLimit > 0):
+          return (self.__retryCount < self.retryLimit)
+      else:
+          return True
+
   def run(self):
-    Log.info("Starting job search...")
-    while self.__retryCount < self.retryLimit:
-      if not self.__retryCount % 50:
-        print(self.__retryCount, 'requests attempted\n\n')
+    Log.info("Starting block search.")
+    while self.whilecond():
+#      if not self.__retryCount % 50:
+#        print(self.__retryCount, 'requests attempted\n\n')
 
       offersResponse = self.__getOffers()
       if offersResponse.status_code == 200:
@@ -463,6 +471,8 @@ class FlexUnlimited:
       else:
         Log.error(offersResponse.json())
         break
-      time.sleep(self.refreshInterval)
-    Log.info("Job search cycle ending...")
+      sleeptime = random.uniform(self.refreshIntervalMin, self.refreshIntervalMax)
+      Log.info("Found 0 new offer(s), sleeping " + str(round(sleeptime, 2)) + "s.")
+      time.sleep(sleeptime)
+    Log.info("Block search stopped.")
     Log.info(f"Accepted {len(self.__acceptedOffers)} offers in {time.time() - self.__startTimestamp} seconds")
