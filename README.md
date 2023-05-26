@@ -15,14 +15,6 @@ It only exits if it encounters a CAPTCHA.
 ## Detect CAPTCHA
 Starting 2023, Amazon now asks suspected bot-users to confirm that they are human through completing a CAPTCHA in the Flex app. If the script encounters this, it will send you an ntfy notification and exit the script entirely.
 
-## ntfy.sh Notifications
-Through the free Android and iOS-app ntfy, the script now provides push notifications when a block has been accepted, as well as when a CAPTCHA is encountered.
-
-Set "ntfyChannel" in config.json to your ntfy.sh-channel, and your notifications will be delivered there.
-
-## Run infinitely
-Set "retryLimit" to 0 in config.json to make the script run infinitely. It only exits if it encounters a CAPTCHA.
-
 ## Randomized refresh interval
 "refreshInterval" in config.js has been split into two:
 
