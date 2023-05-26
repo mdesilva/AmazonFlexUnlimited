@@ -9,6 +9,7 @@ import base64, hashlib, hmac, gzip, secrets
 import pyaes
 from pbkdf2 import PBKDF2
 import random
+from os.path import exists
 
 try:
   from twilio.rest import Client
@@ -63,8 +64,14 @@ class FlexUnlimited:
   }
 
   def __init__(self) -> None:
+    if(exists('localconfig.json')):
+        self.config_file = "localconfig.json"
+        Log.info("Using localconfig.json.")
+    else:
+        self.config_file = "config.json"
+        Log.info("Using config.json")
     try:
-      with open("config.json") as configFile:
+      with open(self.config_file) as configFile:
         config = json.load(configFile)
         self.username = config["username"]
         self.password = config["password"]
@@ -209,7 +216,7 @@ class FlexUnlimited:
     print("If it fails, copy the refresh token into the config file manually.")
     print("Refresh token: " + self.refreshToken)
     try:
-      with open("config.json", "r+") as configFile:
+      with open(self.config_file, "r+") as configFile:
         config = json.load(configFile)
         config["accessToken"] = self.accessToken
         config["refreshToken"] = self.refreshToken
@@ -264,7 +271,7 @@ class FlexUnlimited:
     res = self.session.post(FlexUnlimited.routes.get("RequestNewAccessToken"), json=data, headers=headers).json()
     self.accessToken = res['access_token']
     try:
-      with open("config.json", "r+") as configFile:
+      with open(self.config_file, "r+") as configFile:
         config = json.load(configFile)
         config["accessToken"] = self.accessToken
         configFile.seek(0)
