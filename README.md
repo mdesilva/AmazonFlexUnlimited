@@ -23,6 +23,13 @@ Starting 2023, Amazon now asks suspected bot-users to confirm that they are huma
 
 These are both floats, and the sleep-time between two attempts is found by selecting a random number between the min and max values.
 
+## Stop script at certain time
+You can force the script to stop at a certain hour and minute by setting the "stopRunAt" setting in config.json to the desired time.
+
+E.g. if you want it to stop at 5:22PM, change "stopRunAt" from false to "17:22".
+
+If you do not want the script to stop at a certain time, set "stopRunAt" to false.
+
 ## More console output
 Every attempt, including its sleep-time, is now printed in the console. Disable this by setting "minimalConsoleOutput" to true.
 
