@@ -8,7 +8,7 @@
   "desiredStartTime": "00:00",
   "desiredEndTime": "23:30",
   "desiredWeekdays": ["Mon", "Tue", "Wed", "Thur", "Fri", "Sat", "Sun"],
-  "retryLimit": 10,
+  "retryLimit": 0,
   "refreshIntervalMin": 0.2,
   "refreshIntervalMax": 2,
   "twilioAcctSid": "",
@@ -19,5 +19,6 @@
   "accessToken": "",
   "ntfyChannel": "",
   "minimalConsoleOutput": false,
-  "filterForWarehouse": true
+  "filterForWarehouse": true,
+  "stopRunAt": false
 }

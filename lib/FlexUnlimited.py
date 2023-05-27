@@ -103,6 +103,8 @@ class FlexUnlimited:
         self.ntfyChannel = config['ntfyChannel']
         self.minimalConsoleOutput = config['minimalConsoleOutput']
         self.filterForWarehouse = config['filterForWarehouse']
+        self.stopRunAt = config['stopRunAt']
+        self.start_time = int(datetime.today().timestamp())
 
     except KeyError as nullKey:
       Log.error(f'{nullKey} was not set. Please setup FlexUnlimited as described in the README.')
@@ -510,6 +512,15 @@ class FlexUnlimited:
       sleeptime = random.uniform(self.refreshIntervalMin, self.refreshIntervalMax)
       if not self.minimalConsoleOutput:
         Log.info("Found 0 new offer(s), sleeping " + str(round(sleeptime, 2)) + "s.")
+      if type(self.stopRunAt) is str: 
+          cur_date = datetime.today().strftime('%Y-%m-%d')
+          end_time = int(datetime.strptime(cur_date + " " + self.stopRunAt, "%Y-%m-%d %H:%M").timestamp())
+          cur_time = int(datetime.today().timestamp())
+          if((self.start_time < end_time) and (cur_time > end_time)):
+              Log.info("Block search stopped due to stopRunAt setting.")
+              exit()
+          
+
       time.sleep(sleeptime)
     Log.info("Block search stopped.")
     Log.info(f"Accepted {len(self.__acceptedOffers)} offers in {time.time() - self.__startTimestamp} seconds")
