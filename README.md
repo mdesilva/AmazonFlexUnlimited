@@ -4,9 +4,20 @@ This work is based on the work done by @mdesilva. The original Amazon Flex Unlim
 SUPERCHARGED currently adds the following functionality to the script:
 
 ## ntfy.sh Notifications
-Through the free Android and iOS-app ntfy, the script now provides push notifications when a block has been accepted, as well as when a CAPTCHA is encountered.
+Through the free Android and iOS-app ntfy, the script now provides push notifications.
 
-Set "ntfyChannel" in config.json to your ntft.sh-channel, and your notifications will be delivered there.
+Set "ntfyChannel" in config.json to the ntfy.sh topic you have created in your app, and your notifications will be delivered there.
+
+## Choose which notifications to receive, and which messages to print
+It is possible to customize which notifications to receive and what messaages to have printed in the terminal.
+
+Modify the "notifications" entry in config.json for notifications, or "logging" for what to be printed.
+
+The different categorizations contain the following messages:
+- Notice: On block search started, block search stopped.
+- Info: For every attempt, tells you if it found a listing and how many seconds to sleep before attempting again.
+- Success: On block acceptance.
+- Error: On errors and captchas. 
 
 ## Run infinitely
 Set "retryLimit" to 0 in config.json to make the script run infinitely.
@@ -30,8 +41,10 @@ E.g. if you want it to stop at 5:22PM, change "stopRunAt" from false to "17:22".
 
 If you do not want the script to stop at a certain time, set "stopRunAt" to false.
 
-## More console output
-Every attempt, including its sleep-time, is now printed in the console. Disable this by setting "minimalConsoleOutput" to true.
+## Rate limit parameters
+The default rate limit prevention mechanism consists of a 30 minute pause the first time rate limit is encountered, then 30 * the amount of times a rate limit has been encountered. When this has been multiplied 4 times (30 * 4 = 120), it goes back to 30 minutes.
+
+Change "rateLimit.increment" for the amount of minutes, "rateLimit.maxTimesIncrement" for the max amount of times to multiply increment before going back to increment * 1.
 
 ## Experimental: Method to filter desired warehouses
 The way this script originally chose whether a certain offer should be considered was by sending the id's of the desired warehouses to the getOffer endpoint. Instead, it is possible to fetch all offers, but only accept the ones with the correct warehouse id.
