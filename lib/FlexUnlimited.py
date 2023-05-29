@@ -66,10 +66,8 @@ class FlexUnlimited:
   def __init__(self) -> None:
     if(exists('localconfig.json')):
         self.config_file = "localconfig.json"
-        Log.info("Using localconfig.json.")
     else:
         self.config_file = "config.json"
-        Log.info("Using config.json")
     try:
       with open(self.config_file) as configFile:
         config = json.load(configFile)
@@ -101,16 +99,18 @@ class FlexUnlimited:
         twilioAcctSid = config["twilioAcctSid"]
         twilioAuthToken = config["twilioAuthToken"]
         self.ntfyChannel = config['ntfyChannel']
-        self.minimalConsoleOutput = config['minimalConsoleOutput']
+        self.logging = config['logging']
+        self.notifications = config['notifications']
         self.filterForWarehouse = config['filterForWarehouse']
         self.stopRunAt = config['stopRunAt']
         self.start_time = int(datetime.today().timestamp())
+        self.rateLimit = config['rateLimit']
 
     except KeyError as nullKey:
-      Log.error(f'{nullKey} was not set. Please setup FlexUnlimited as described in the README.')
+      Log.error(f'{nullKey} was not set. Please setup FlexUnlimited as described in the README.', self)
       sys.exit()
     except FileNotFoundError:
-      Log.error("Config file not found. Ensure a properly formatted 'config.json' file exists in the root directory.")
+      Log.error("Config file not found. Ensure a properly formatted 'config.json' file exists in the root directory.", self)
       sys.exit()
 
     if twilioAcctSid != "" and twilioAuthToken != "" and self.twilioFromNumber != "" and self.twilioToNumber != "":
@@ -237,10 +237,10 @@ class FlexUnlimited:
         json.dump(config, configFile, indent=2)
         configFile.truncate()
     except KeyError as nullKey:
-      Log.error(f'{nullKey} was not set. Please setup FlexUnlimited as described in the README.')
+      Log.error(f'{nullKey} was not set. Please setup FlexUnlimited as described in the README.', self)
       sys.exit()
     except FileNotFoundError:
-      Log.error("Config file not found. Ensure a properly formatted 'config.json' file exists in the root directory.")
+      Log.error("Config file not found. Ensure a properly formatted 'config.json' file exists in the root directory.", self)
       sys.exit()
     print("registration successful")
 
@@ -291,10 +291,10 @@ class FlexUnlimited:
         json.dump(config, configFile, indent=2)
         configFile.truncate()
     except KeyError as nullKey:
-      Log.error(f'{nullKey} was not set. Please setup FlexUnlimited as described in the README.')
+      Log.error(f'{nullKey} was not set. Please setup FlexUnlimited as described in the README.', self)
       sys.exit()
     except FileNotFoundError:
-      Log.error("Config file not found. Ensure a properly formatted 'config.json' file exists in the root directory.")
+      Log.error("Config file not found. Ensure a properly formatted 'config.json' file exists in the root directory.", self)
       sys.exit()
     self.__requestHeaders["x-amz-access-token"] = self.accessToken
 
@@ -429,16 +429,12 @@ class FlexUnlimited:
           to=self.twilioToNumber,
           from_=self.twilioFromNumber,
           body=offer.toString())
-      if self.ntfyChannel != "":
-          Log.ntfy("Succesfully accepted an offer.", self.ntfyChannel)
-      Log.success(f"Successfully accepted an offer.")
+      Log.success(f"Successfully accepted an offer.", self)
     elif request.status_code == 307:
-        Log.error("Please open Amazon Flex app, accept offer, and complete captcha to proceed.")
-        if self.ntfyChannel != "":
-            Log.ntfy("Please open Amazon Flex app, accept offer, and complete captcha to proceed.", self.ntfyChannel)
+        Log.error("Please open Amazon Flex app, accept offer, and complete captcha to proceed.", self)
         exit()
     else:
-      Log.error(f"Unable to accept an offer. Request returned status code {request.status_code}")
+      Log.error(f"Unable to accept an offer. Request returned status code {request.status_code}", self)
 
   def __processOffer(self, offer: Offer):
     if offer.hidden:
@@ -475,7 +471,7 @@ class FlexUnlimited:
           return True
 
   def run(self):
-    Log.info("Starting block search.")
+    Log.notice("Starting block search.", self)
     while self.whilecond():
 #      if not self.__retryCount % 50:
 #        print(self.__retryCount, 'requests attempted\n\n')
@@ -487,40 +483,36 @@ class FlexUnlimited:
                            reverse=True)
         for offer in currentOffers:
           offerResponseObject = Offer(offerResponseObject=offer)
-          if not self.minimalConsoleOutput:
-            Log.info("Listing found offer:")
-            Log.info(offerResponseObject.toString())
+          Log.notice("Found the following offer:", self)
+          Log.notice(offerResponseObject.toString(), self)
           self.__processOffer(offerResponseObject)
         self.__retryCount += 1
       elif offersResponse.status_code == 400:
-        minutes_to_wait = 30 * self.__rate_limit_number
-        Log.info("Rate limit reached. Waiting for " + str(minutes_to_wait) + " minutes.")
+        minutes_to_wait = self.rateLimit['increment'] * self.__rate_limit_number
+        Log.notice("Rate limit reached. Waiting for " + str(minutes_to_wait) + " minutes.", self)
         time.sleep(minutes_to_wait * 60)
-        if self.__rate_limit_number < 4:
+        if self.__rate_limit_number < self.rateLimit['maxTimesIncrement']:
           self.__rate_limit_number += 1
         else:
           self.__rate_limit_number = 1
-        Log.info("Resuming search.")
+        Log.notice("Resuming search.", self)
       elif offersResponse.status_code == 307:
-          Log.error("Please open Amazon Flex app, accept offer, and complete captcha to proceed.")
-          if self.ntfyChannel != "":
-              Log.ntfy("Please open Amazon Flex app, accept offer, and complete captcha to proceed.", self.ntfyChannel)
+          Log.error("Please open Amazon Flex app, accept offer, and complete captcha to proceed.", self)
           exit()
       else:
-        Log.error(offersResponse.json())
+        Log.error(offersResponse.json(), self)
         break
       sleeptime = random.uniform(self.refreshIntervalMin, self.refreshIntervalMax)
-      if not self.minimalConsoleOutput:
-        Log.info("Found 0 new offer(s), sleeping " + str(round(sleeptime, 2)) + "s.")
+      Log.info("Found 0 new offer(s), sleeping " + str(round(sleeptime, 2)) + "s.", self)
       if type(self.stopRunAt) is str: 
           cur_date = datetime.today().strftime('%Y-%m-%d')
           end_time = int(datetime.strptime(cur_date + " " + self.stopRunAt, "%Y-%m-%d %H:%M").timestamp())
           cur_time = int(datetime.today().timestamp())
           if((self.start_time < end_time) and (cur_time > end_time)):
-              Log.info("Block search stopped due to stopRunAt setting.")
+              Log.notice("Block search stopped due to stopRunAt setting.", self)
               exit()
           
 
       time.sleep(sleeptime)
-    Log.info("Block search stopped.")
-    Log.info(f"Accepted {len(self.__acceptedOffers)} offers in {time.time() - self.__startTimestamp} seconds")
+    Log.notice("Block search stopped.", self)
+    Log.notice(f"Accepted {len(self.__acceptedOffers)} offers in {time.time() - self.__startTimestamp} seconds", self)
