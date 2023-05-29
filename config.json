@@ -27,7 +27,7 @@
 		"error": true
 	},
 	"notifications": {
-		"notice": true,
+		"notice": false,
 		"info": false,
 		"success": true,
 		"error": true
