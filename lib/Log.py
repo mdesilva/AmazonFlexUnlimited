@@ -12,7 +12,7 @@ class Log:
 
     @staticmethod 
     def success(message: str, flexClass):
-        if(flexClass.notifications['error']):
+        if(flexClass.notifications['success']):
             requests.post("https://ntfy.sh/" + flexClass.ntfyChannel, data = message.encode(encoding="utf-8"))
 
         if(flexClass.logging['success']):
@@ -20,7 +20,7 @@ class Log:
 
     @staticmethod 
     def notice(message: str, flexClass):
-        if(flexClass.notifications['error']):
+        if(flexClass.notifications['notice']):
             requests.post("https://ntfy.sh/" + flexClass.ntfyChannel, data = message.encode(encoding="utf-8"))
 
         if(flexClass.logging['notice']):
