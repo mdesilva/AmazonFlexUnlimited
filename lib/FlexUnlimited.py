@@ -473,11 +473,12 @@ class FlexUnlimited:
           return True
 
   def run(self):
-    if type(self.startRunAt) is str:
-        Log.notice(f"Run not starting until {self.startRunAt} due to startRunAt setting.", self)
+    if ((type(self.startRunAt) is str) and (self.started == 0)): 
+      Log.notice(f"Run not starting until {self.startRunAt} due to startRunAt setting.", self)
 
     while self.whilecond():
-      if type(self.startRunAt) is str: 
+      sleeptime = random.uniform(self.refreshIntervalMin, self.refreshIntervalMax)
+      if ((type(self.startRunAt) is str) and (self.started == 0)): 
           cur_date = datetime.today().strftime('%Y-%m-%d')
           begin_time = int(datetime.strptime(cur_date + " " + self.startRunAt, "%Y-%m-%d %H:%M").timestamp())
           cur_time = int(datetime.today().timestamp())
@@ -487,8 +488,10 @@ class FlexUnlimited:
           elif ((cur_time > begin_time) and (self.started == 0)):
               Log.notice("startRunAt-time has passed. Starting block search.", self)
               self.started = 1
-      else:
+      elif self.started == 0:
           Log.notice("Starting block search.", self)
+          self.started = 1
+          continue
       offersResponse = self.__getOffers()
       if offersResponse.status_code == 200:
         currentOffers = offersResponse.json().get("offerList")
@@ -500,6 +503,8 @@ class FlexUnlimited:
           Log.notice(offerResponseObject.toString(), self)
           self.__processOffer(offerResponseObject)
         self.__retryCount += 1
+        if(len(currentOffers) == 0):
+          Log.info("Found 0 new offer(s), sleeping " + str(round(sleeptime, 2)) + "s.", self)
       elif offersResponse.status_code == 400:
         minutes_to_wait = self.rateLimit['increment'] * self.__rate_limit_number
         Log.notice("Rate limit reached. Waiting for " + str(minutes_to_wait) + " minutes.", self)
@@ -515,8 +520,6 @@ class FlexUnlimited:
       else:
         Log.error(offersResponse.json(), self)
         break
-      sleeptime = random.uniform(self.refreshIntervalMin, self.refreshIntervalMax)
-      Log.info("Found 0 new offer(s), sleeping " + str(round(sleeptime, 2)) + "s.", self)
       if type(self.stopRunAt) is str: 
           cur_date = datetime.today().strftime('%Y-%m-%d')
           end_time = int(datetime.strptime(cur_date + " " + self.stopRunAt, "%Y-%m-%d %H:%M").timestamp())
