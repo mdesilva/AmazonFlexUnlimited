@@ -41,6 +41,14 @@ E.g. if you want it to stop at 5:22PM, change "stopRunAt" from false to "17:22".
 
 If you do not want the script to stop at a certain time, set "stopRunAt" to false.
 
+## Start script at certain time
+You can start the script and not have it start until a certain hour and minute by setting the "startRunAt" setting in config.json to the desired time.
+
+E.g. if you want it to start at 5:22PM, change "startRunAt" from false to "17:22".
+
+If you want the script to start immediately, set "startRunAt" to false.
+
+
 ## Rate limit parameters
 The default rate limit prevention mechanism consists of a 30 minute pause the first time rate limit is encountered, then 30 * the amount of times a rate limit has been encountered. When this has been multiplied 4 times (30 * 4 = 120), it goes back to 30 minutes.
 
