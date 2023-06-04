@@ -482,12 +482,14 @@ class FlexUnlimited:
           cur_date = datetime.today().strftime('%Y-%m-%d')
           begin_time = int(datetime.strptime(cur_date + " " + self.startRunAt, "%Y-%m-%d %H:%M").timestamp())
           cur_time = int(datetime.today().timestamp())
-          if ((cur_time < begin_time) and (self.started == 0)):
-              time.sleep(0.5)
-              continue
-          elif ((cur_time > begin_time) and (self.started == 0)):
+
+          if((cur_time > begin_time) and (self.start_time < begin_time) and (self.started == 0)):
               Log.notice("startRunAt-time has passed. Starting block search.", self)
               self.started = 1
+          else:
+              time.sleep(0.5)
+              continue
+
       elif self.started == 0:
           Log.notice("Starting block search.", self)
           self.started = 1
