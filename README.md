@@ -3,6 +3,24 @@ This work is based on the work done by @mdesilva. The original Amazon Flex Unlim
 
 SUPERCHARGED currently adds the following functionality to the script:
 
+## Table of Contents
+
+* [New Features in Amazon Flex Unlimited SUPERCHARGED](#amazon-flex-unlimited-supercharged)
+   * [ntfy.sh Notifications](#ntfysh-notifications)
+   * [Choose which notifications to receive, and which messages to print](#choose-which-notifications-to-receive-and-which-messages-to-print)
+   * [Run infinitely](#run-infinitely)
+   * [Detect CAPTCHA](#detect-captcha)
+   * [Randomized refresh interval](#randomized-refresh-interval)
+   * [Stop script at certain time](#stop-script-at-certain-time)
+   * [Start script at certain time](#start-script-at-certain-time)
+   * [Rate limit parameters](#rate-limit-parameters)
+   * [Experimental: Method to filter desired warehouses](#experimental-method-to-filter-desired-warehouses)
+* [Original README.md](#original-readmemd)
+* [Flex Unlimited](#flex-unlimited)
+   * [Automate searching and accepting Amazon Flex Driver jobs](#automate-searching-and-accepting-amazon-flex-driver-jobs)
+   * [Usage](#usage)
+   * [Troubleshooting](#troubleshooting)
+
 ## ntfy.sh Notifications
 Through the free Android and iOS-app ntfy, the script now provides push notifications.
 
