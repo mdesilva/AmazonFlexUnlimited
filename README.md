@@ -42,7 +42,7 @@ E.g. if you want it to stop at 5:22PM, change "stopRunAt" from false to "17:22".
 If you do not want the script to stop at a certain time, set "stopRunAt" to false.
 
 ## Start script at certain time
-You can start the script and not have it start until a certain hour and minute by setting the "startRunAt" setting in config.json to the desired time.
+You can start the script and not have it begin block search until a certain hour and minute by setting the "startRunAt" setting in config.json to the desired time.
 
 E.g. if you want it to start at 5:22PM, change "startRunAt" from false to "17:22".
 
