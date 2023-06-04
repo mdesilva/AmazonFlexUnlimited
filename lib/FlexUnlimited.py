@@ -103,7 +103,9 @@ class FlexUnlimited:
         self.notifications = config['notifications']
         self.filterForWarehouse = config['filterForWarehouse']
         self.stopRunAt = config['stopRunAt']
+        self.startRunAt = config['startRunAt']
         self.start_time = int(datetime.today().timestamp())
+        self.started = 0
         self.rateLimit = config['rateLimit']
 
     except KeyError as nullKey:
@@ -471,11 +473,22 @@ class FlexUnlimited:
           return True
 
   def run(self):
-    Log.notice("Starting block search.", self)
-    while self.whilecond():
-#      if not self.__retryCount % 50:
-#        print(self.__retryCount, 'requests attempted\n\n')
+    if type(self.startRunAt) is str:
+        Log.notice(f"Run not starting until {self.startRunAt} due to startRunAt setting.", self)
 
+    while self.whilecond():
+      if type(self.startRunAt) is str: 
+          cur_date = datetime.today().strftime('%Y-%m-%d')
+          begin_time = int(datetime.strptime(cur_date + " " + self.startRunAt, "%Y-%m-%d %H:%M").timestamp())
+          cur_time = int(datetime.today().timestamp())
+          if ((cur_time < begin_time) and (self.started == 0)):
+              time.sleep(0.5)
+              continue
+          elif ((cur_time > begin_time) and (self.started == 0)):
+              Log.notice("startRunAt-time has passed. Starting block search.", self)
+              self.started = 1
+      else:
+          Log.notice("Starting block search.", self)
       offersResponse = self.__getOffers()
       if offersResponse.status_code == 200:
         currentOffers = offersResponse.json().get("offerList")

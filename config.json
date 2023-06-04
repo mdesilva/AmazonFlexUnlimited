@@ -20,6 +20,7 @@
 	"ntfyChannel": "",
 	"filterForWarehouse": true,
 	"stopRunAt": false,
+	"startRunAt": false,
 	"logging": {
 		"notice": true,
 		"info": true,
