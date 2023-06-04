@@ -499,7 +499,7 @@ class FlexUnlimited:
                            reverse=True)
         for offer in currentOffers:
           offerResponseObject = Offer(offerResponseObject=offer)
-          Log.notice("Found the following offer:", self)
+          Log.notice("Found the following offer (now sleeping " + str (round(sleeptime, 2)) + "s):", self)
           Log.notice(offerResponseObject.toString(), self)
           self.__processOffer(offerResponseObject)
         self.__retryCount += 1
