@@ -72,6 +72,17 @@ The default rate limit prevention mechanism consists of a 30 minute pause the fi
 
 Change "rateLimit.increment" for the amount of minutes, "rateLimit.maxTimesIncrement" for the max amount of times to multiply increment before going back to increment * 1.
 
+So, if I want it to only stop for 15 minutes, and only go up to max 45 minutes (15 * 3) before resetting, I would set the settings as follows:
+
+```json
+...
+  "rateLimit": {
+    "increment": 15,
+    "maxTimesIncrement": 3
+  }
+...
+```
+
 ## Experimental: Method to filter desired warehouses
 The way this script originally chose whether a certain offer should be considered was by sending the id's of the desired warehouses to the getOffer endpoint. Instead, it is possible to fetch all offers, but only accept the ones with the correct warehouse id.
 
