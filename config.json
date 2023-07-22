@@ -1,8 +1,8 @@
 {
 	"username": "",
 	"password": "",
-	"minBlockRate": 150,
-	"minPayRatePerHour": 32,
+	"minBlockRate": 1,
+	"minPayRatePerHour": 1,
 	"arrivalBuffer": 45,
 	"desiredWarehouses": [],
 	"desiredStartTime": "00:00",
